@@ -36,7 +36,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
     [self setupCustomBar];
 }
 
@@ -66,7 +65,8 @@
 
 - (void)setupCustomBar {
     
-   self.topBackgroundView.backgroundColor = [UIColor colorWithWhite:242/255.0 alpha:0.5];
+    self.view.backgroundColor = [UIColor whiteColor];
+    self.topBackgroundView.backgroundColor = [UIColor colorWithWhite:242/255.0 alpha:0.5];
     
     self.shadowLineView.image = [self xy_imageWithColor:[UIColor colorWithWhite:220/255.0 alpha:0.8]];
     
@@ -117,6 +117,7 @@
 
 
 - (void)makeConstr {
+    
     NSDictionary *views = NSDictionaryOfVariableBindings(_topBackgroundView, _shadowLineView);
     NSDictionary *metrics = @{@"leftButtonMaxW": @150, @"leftButtonLeftM": @10, @"leftBtnH": @44, @"rightBtnH": @44, @"rightBtnRightM": @10};
     

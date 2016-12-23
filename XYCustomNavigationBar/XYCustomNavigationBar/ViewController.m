@@ -37,10 +37,10 @@
     
     // model弹出
     ViewController *vc = [ViewController new];
-    vc.view.backgroundColor = [UIColor colorWithWhite:38/255.0 alpha:0.8];
+    vc.view.backgroundColor = [UIColor whiteColor];
     vc.xy_titleColor = [UIColor blackColor];
     vc.xy_title = @"Model的";
-    vc.topBackgroundView.backgroundColor = [UIColor colorWithWhite:240/255.0 alpha:0.5];
+    vc.topBackgroundView.backgroundColor = [UIColor colorWithWhite:80/255.0 alpha:0.5];
     XYProfileNavigationController *nav = [[XYProfileNavigationController alloc] initWithRootViewController:vc];
     [self presentViewController:nav animated:YES completion:nil];
 }
