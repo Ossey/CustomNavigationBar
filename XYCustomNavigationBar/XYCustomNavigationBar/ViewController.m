@@ -28,7 +28,7 @@
     self.rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.rightButton setTitle:@"右侧" forState:UIControlStateNormal];
     
-    _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 64, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
+    _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.topBackgroundView.frame), CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
     _imageView.image = [UIImage imageNamed:@"1"];
     [self.view insertSubview:_imageView atIndex:0];
 }
@@ -37,12 +37,17 @@
     
     // model弹出
     ViewController *vc = [ViewController new];
-    vc.view.backgroundColor = [UIColor whiteColor];
+    vc.view.backgroundColor = [UIColor colorWithWhite:38/255.0 alpha:0.8];
     vc.xy_titleColor = [UIColor blackColor];
     vc.xy_title = @"Model的";
     vc.topBackgroundView.backgroundColor = [UIColor colorWithWhite:240/255.0 alpha:0.5];
     XYProfileNavigationController *nav = [[XYProfileNavigationController alloc] initWithRootViewController:vc];
     [self presentViewController:nav animated:YES completion:nil];
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+
+    return UIStatusBarStyleLightContent;
 }
 
 

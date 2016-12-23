@@ -36,7 +36,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor whiteColor];
+    
     [self setupCustomBar];
 }
 
@@ -68,10 +68,9 @@
     
    self.topBackgroundView.backgroundColor = [UIColor colorWithWhite:242/255.0 alpha:0.5];
     
-    self.shadowLineView.image = [self xy_imageWithColor:[UIColor colorWithWhite:100 alpha:0.8]];
+    self.shadowLineView.image = [self xy_imageWithColor:[UIColor colorWithWhite:220/255.0 alpha:0.8]];
     
     [self.leftButton addTarget:self action:@selector(xy_leftButtonClick) forControlEvents:UIControlEventTouchUpInside];
-    
 }
 
 
