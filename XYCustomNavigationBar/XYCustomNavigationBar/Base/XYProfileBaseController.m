@@ -8,9 +8,7 @@
 
 #import "XYProfileBaseController.h"
 
-@interface XYProfileBaseController () {
-    
-}
+@interface XYProfileBaseController ()
 
 @property (nonatomic, strong) UIImageView *topBackgroundView; // 导航条topBackgroundView
 @property (nonatomic, strong) UIImageView *shadowLineView;    // 导航条阴影线
@@ -31,12 +29,30 @@
 @synthesize xy_backBarImage = _xy_backBarImage;
 @synthesize hiddenLeftButton = _hiddenLeftButton;
 @synthesize xy_titleColor = _xy_titleColor;
+@synthesize xy_tintColor = _xy_tintColor;
 
 #pragma mark - 控制器view的生命周期
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     [self setupCustomBar];
+    
+    
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    
+    [super viewDidAppear:animated];
+    
+//    if ([self isModel]) {
+//        self.hiddenLeftButton = NO;
+//        return;
+//    }
+//    if (self.navigationController.childViewControllers.count <= 1) {
+//        self.hiddenLeftButton = YES;
+//    } else {
+//        self.hiddenLeftButton = NO;
+//    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -45,14 +61,13 @@
     
     if ([self isModel]) {
         self.hiddenLeftButton = NO;
-    } else {
-        if (self.navigationController.childViewControllers.count == 1) {
-            self.hiddenLeftButton = YES;
-        } else {
-            self.hiddenLeftButton = NO;
-        }
+        return;
     }
-    
+    if (self.navigationController.childViewControllers.count <= 1) {
+        self.hiddenLeftButton = YES;
+    } else {
+        self.hiddenLeftButton = NO;
+    }
 }
 
 - (void)viewWillLayoutSubviews {
@@ -63,12 +78,14 @@
     
 }
 
+
+#pragma mark - 私有方法
 - (void)setupCustomBar {
     
     self.view.backgroundColor = [UIColor whiteColor];
-    self.topBackgroundView.backgroundColor = [UIColor colorWithWhite:242/255.0 alpha:0.5];
+    self.topBackgroundView.backgroundColor = [UIColor colorWithWhite:242/255.0 alpha:0.7];
     
-    self.shadowLineView.image = [self xy_imageWithColor:[UIColor colorWithWhite:220/255.0 alpha:0.8]];
+    self.shadowLineView.backgroundColor = [UIColor colorWithWhite:160/255.0 alpha:0.7];
     
     [self.leftButton addTarget:self action:@selector(xy_leftButtonClick) forControlEvents:UIControlEventTouchUpInside];
 }
@@ -94,7 +111,6 @@
 }
 
 
-#pragma mark - Private Method
 - (UIImage *)xy_imageWithColor:(UIColor *)color {
     
     CGRect rect = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
@@ -188,6 +204,13 @@
 - (UIColor *)xy_tintColor {
     
     return _xy_tintColor ?: [UIColor colorWithWhite:50/255.0 alpha:1.0];
+}
+
+- (void)setXy_tintColor:(UIColor *)xy_tintColor {
+    
+    _xy_tintColor = xy_tintColor;
+    [self.leftButton setTitleColor:xy_tintColor forState:UIControlStateNormal];
+    [self.rightButton setTitleColor:xy_tintColor forState:UIControlStateNormal];
 }
 
 - (void)setXy_title:(NSString *)xy_title {

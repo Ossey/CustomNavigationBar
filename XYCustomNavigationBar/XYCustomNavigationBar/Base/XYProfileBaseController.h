@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly) UIImageView *topBackgroundView;
 
+@property (nonatomic, strong, readonly) UIImageView *shadowLineView;    // 导航条阴影线
+
 @property (nonatomic, weak) UIButton *rightButton;
 
 /** 导航条自定义的titleView， 注意: 当设置了xy_customTitleView，属性title则无效 */
@@ -34,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UIFont *xy_buttonFont;
 
 /** 是否隐藏导航条左侧按钮 */
-@property (nonatomic, assign, getter=isHiddenLeftButton) BOOL hiddenLeftButton;
+@property (nonatomic, assign, getter=isHiddenLeftButton) BOOL hiddenLeftButton; // 默认隐藏
 
 - (void)xy_setBackBarTitle:(nullable NSString *)title titleColor:(nullable UIColor *)color image:(nullable UIImage *)image forState:(UIControlState)state;
 

@@ -24,6 +24,7 @@
     
     self.xy_title = @"自定义的导航条";
     self.xy_titleColor = [UIColor whiteColor];
+    
     // 设置右侧按钮
     self.rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.rightButton setTitle:@"右侧" forState:UIControlStateNormal];
@@ -40,6 +41,9 @@
     vc.view.backgroundColor = [UIColor whiteColor];
     vc.xy_titleColor = [UIColor blackColor];
     vc.xy_title = @"Model的";
+    vc.xy_tintColor = [UIColor whiteColor];
+    vc.xy_titleColor = [UIColor whiteColor];
+    vc.shadowLineView.backgroundColor = [UIColor clearColor];
     vc.topBackgroundView.backgroundColor = [UIColor colorWithWhite:80/255.0 alpha:0.5];
     XYProfileNavigationController *nav = [[XYProfileNavigationController alloc] initWithRootViewController:vc];
     [self presentViewController:nav animated:YES completion:nil];
