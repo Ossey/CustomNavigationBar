@@ -8,234 +8,54 @@
 
 #import "XYProfileBaseController.h"
 
-@interface XYProfileBaseController ()
+@interface XYProfileBaseController () {
+    
+}
 
-/** 导航条topBackgroundView */
-@property (nonatomic, strong) UIImageView *topBackgroundView;
-/** 导航条阴影线 */
-@property (nonatomic, strong) UIImageView *shadowLineView;
-/** 导航条左侧按钮 */
-@property (nonatomic, weak) UIButton *leftButton;
-/** 导航条titleView */
-@property (nonatomic, weak) UIButton *xy_titleView;
-/** 导航条左侧返回按钮的文字，这个属性在当前控制器下有效 */
-@property (nonatomic, copy) NSString *xy_backBarTitle;
-/** 导航条左侧返回按钮的图片 */
-@property (nonatomic, strong) UIImage *xy_backBarImage;
-/** 导航条左侧返回按钮的状态 */
-@property (nonatomic, assign) UIControlState xy_backBarState;
-
+@property (nonatomic, strong) UIImageView *topBackgroundView; // 导航条topBackgroundView
+@property (nonatomic, strong) UIImageView *shadowLineView;    // 导航条阴影线
+@property (nonatomic, strong) UIImage *xy_backBarImage;      // 导航条左侧返回按钮的图片
+@property (nonatomic, assign) UIControlState xy_backBarState; // 导航条左侧返回按钮的状态
+@property (nonatomic, weak) UIButton *leftButton;            // 导航条左侧按钮
+@property (nonatomic, weak) UIButton *xy_titleView;          // 导航条titleView
+@property (nonatomic, copy) NSString *xy_backBarTitle;       // 导航条左侧返回按钮的文字，这个属性在当前控制器下有效
 @property (nonatomic, weak) NSLayoutConstraint *topBackgroundViewHConst;
 @end
 
 @implementation XYProfileBaseController
+
 @synthesize rightButton = _rightButton;
 @synthesize xy_titleView = _xy_titleView;
 @synthesize xy_title = _xy_title;
 @synthesize xy_backBarTitle = _xy_backBarTitle;
 @synthesize xy_backBarImage = _xy_backBarImage;
-
-//@synthesize xy_globalBarTitle = _xy_globalBarTitle;
-
-#pragma mark - set和get方法
-- (UIFont *)xy_buttonFont {
-
-    return _xy_buttonFont ?: [UIFont systemFontOfSize:16];
-}
-- (UIColor *)xy_tintColor {
-
-    return _xy_tintColor ?: [UIColor blackColor];
-}
-
-- (void)setXy_title:(NSString *)xy_title {
-
-    _xy_title = xy_title;
-    // 注意: 这里不要使用self.xy_customTitleView, 因为这样会调用set方法,而我在set方法中又做侧判断，会导致移除失败
-    if (_xy_customTitleView) {
-        [_xy_customTitleView removeFromSuperview];
-        _xy_customTitleView = nil;
-    }
-
-}
-
-- (NSString *)xy_title {
-    
-    return _xy_title ?: nil;
-    
-}
-
-- (BOOL)isHiddenLeftButton {
-
-    return _hiddenLeftButton ?: NO;
-}
-
-
-- (void)setXy_customTitleView:(UIView *)xy_customTitleView {
-
-    _xy_customTitleView = xy_customTitleView;
-    // 注意: 这里不要使用self.xy_titleView, 因为这样会调用set方法,而我在set方法中又做侧判断，会导致移除失败
-    if (_xy_title || _xy_titleView) {
-        // 为了避免自定义的titleView与xy_titleView产生冲突
-        _xy_title = nil;
-        [_xy_titleView removeFromSuperview];
-        _xy_titleView = nil;
-    }
-    if (!xy_customTitleView.superview && ![xy_customTitleView.superview isEqual:self.topBackgroundView]) {
-        if ([xy_customTitleView isKindOfClass:[UILabel class]]) {
-            UILabel *label = (UILabel *)xy_customTitleView;
-            label.textAlignment = NSTextAlignmentCenter;
-        }
-        [self.topBackgroundView addSubview:xy_customTitleView];
-        xy_customTitleView.translatesAutoresizingMaskIntoConstraints = NO;
-    }
-
-    
-}
-
-- (UIButton *)xy_titleView {
-    if (_xy_titleView == nil) {
-        // 右侧按钮
-        UIButton *titleView = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.topBackgroundView addSubview:titleView];
-        [titleView setTitle:self.xy_title forState:UIControlStateNormal];
-        [titleView setTitleColor:self.xy_tintColor forState:UIControlStateNormal];
-        _xy_titleView = titleView;
-        titleView.translatesAutoresizingMaskIntoConstraints = NO;
-        return _xy_titleView;
-    } else {
-        [_xy_titleView setTitleColor:self.xy_tintColor forState:UIControlStateNormal];
-        return _xy_titleView;
-    }
-}
-
-
-- (void)setXy_titleView:(UIButton *)xy_titleView {
-    
-    _xy_titleView = xy_titleView;
-    [xy_titleView removeFromSuperview];
-    if (!xy_titleView.superview && ![xy_titleView.superview isEqual:self.topBackgroundView]) {
-        [self.topBackgroundView addSubview:xy_titleView];
-        xy_titleView.userInteractionEnabled = NO;
-        xy_titleView.translatesAutoresizingMaskIntoConstraints = NO;
-    }
-}
-
-- (UIButton *)rightButton {
-    if (_rightButton) {
-        
-        [_rightButton setTitleColor:self.xy_tintColor forState:UIControlStateNormal];
-        _rightButton.titleLabel.font = self.xy_buttonFont;
-    }
-    return _rightButton;
-}
-
-- (void)setRightButton:(UIButton *)rightButton {
-
-    _rightButton = rightButton;
-    [rightButton removeFromSuperview];
-    if (!rightButton.superview && ![rightButton.superview isEqual:self.topBackgroundView]) {
-       [self.topBackgroundView addSubview:rightButton];
-        rightButton.translatesAutoresizingMaskIntoConstraints = NO;
-    }
-
-}
-
-
-//- (NSString *)xy_globalBarTitle {
-//    
-//    return _xy_globalBarTitle ?: @"返回";
-//}
-
-- (UIControlState )xy_backBarState {
-
-    return _xy_backBarState ?: UIControlStateNormal;
-}
-
-- (void)setXy_backBarImage:(UIImage *)xy_backBarImage {
-
-    _xy_backBarImage = xy_backBarImage;
-    [self.leftButton setImage:xy_backBarImage forState:self.xy_backBarState];
-}
-
-- (void)setXy_backBarTitle:(NSString *)xy_backBarTitle {
-
-    xy_backBarTitle = xy_backBarTitle;
-    
-    [self.leftButton setTitle:xy_backBarTitle forState:self.xy_backBarState];
-}
-
-- (NSString *)xy_backBarTitle {
-
-    return _xy_backBarTitle ?: @"返回";
-}
-- (UIImage *)xy_backBarImage {
-
-    return _xy_backBarImage ?: nil;
-}
-
-- (UIButton *)leftButton {
-    if (_leftButton == nil) {
-        // 左侧返回按钮
-        UIButton *leftButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [leftButton setTitle:self.xy_backBarTitle forState:UIControlStateNormal];
-        [leftButton setImage:self.xy_backBarImage forState:UIControlStateNormal];
-        leftButton.titleLabel.font = self.xy_buttonFont;
-        [leftButton setTitleColor:self.xy_tintColor forState:UIControlStateNormal];
-        [leftButton setTitleColor:[UIColor redColor] forState:UIControlStateHighlighted];
-        [self.topBackgroundView addSubview:leftButton];
-        _leftButton = leftButton;
-        leftButton.hidden = self.isHiddenLeftButton;
-        leftButton.translatesAutoresizingMaskIntoConstraints = NO;
-        
-    }
-    return _leftButton;
-}
-
-
-- (UIImageView *)topBackgroundView {
-
-    if (_topBackgroundView == nil) {
-        UIImageView *topBackgroundView = [[UIImageView alloc] init];
-        topBackgroundView.userInteractionEnabled = YES;
-        topBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.view addSubview:topBackgroundView];
-        
-        _topBackgroundView = topBackgroundView;
-    }
-    return _topBackgroundView;
-}
-
-- (UIImageView *)shadowLineView {
-
-    if (_shadowLineView == nil) {
-        UIImageView *shadowLineView = [[UIImageView alloc] init];
-        shadowLineView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.topBackgroundView addSubview:shadowLineView];
-        [self.topBackgroundView bringSubviewToFront:shadowLineView];
-        _shadowLineView = shadowLineView;
-    }
-    return _shadowLineView;
-}
-
-- (void)xy_setBackBarTitle:(nullable NSString *)title titleColor:(UIColor *)color image:(nullable UIImage *)image forState:(UIControlState)state {
-    _xy_backBarTitle = title;
-    _xy_backBarImage = image;
-    _xy_backBarState = state;
-    [self.leftButton setTitle:title forState:state];
-    [self.leftButton setImage:image forState:state];
-    [self.leftButton setTitleColor:color forState:state];
-}
-
+@synthesize hiddenLeftButton = _hiddenLeftButton;
+@synthesize xy_titleColor = _xy_titleColor;
 
 #pragma mark - 控制器view的生命周期
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor whiteColor];
-    
-    // 自定义导航条
     [self setupCustomBar];
 }
+
+- (void)viewWillAppear:(BOOL)animated {
+    
+    [super viewWillAppear:animated];
+    
+    if ([self isModel]) {
+        self.hiddenLeftButton = NO;
+    } else {
+        if (self.navigationController.childViewControllers.count == 1) {
+            self.hiddenLeftButton = YES;
+        } else {
+            self.hiddenLeftButton = NO;
+        }
+    }
+    
+}
+
 - (void)viewWillLayoutSubviews {
     
     [super viewWillLayoutSubviews];
@@ -244,26 +64,21 @@
     
 }
 
-
 - (void)setupCustomBar {
     
-    // 导航条背景
-   self.topBackgroundView.backgroundColor = [UIColor colorWithRed:238/255.0 green:238/255.0 blue:238/255.0 alpha:0.6];
+   self.topBackgroundView.backgroundColor = [UIColor colorWithWhite:242/255.0 alpha:0.5];
     
-    // 导航阴影线
     self.shadowLineView.image = [self xy_imageWithColor:[UIColor colorWithWhite:100 alpha:0.8]];
     
-    // 左侧按钮视图
     [self.leftButton addTarget:self action:@selector(xy_leftButtonClick) forControlEvents:UIControlEventTouchUpInside];
     
 }
 
 
-// 点击左侧返回按钮的事件
+
 - (void)xy_leftButtonClick {
     
-    // 判断两种情况: push 和 present
-    if (self.presentedViewController || self.presentingViewController) {
+    if ([self isModel]) {
         [self dismissViewControllerAnimated:YES completion:nil];
     }else
         [self.navigationController popViewControllerAnimated:YES];
@@ -271,9 +86,16 @@
 }
 
 
+- (BOOL)isModel {
+    
+    if (self.presentedViewController || self.presentingViewController) {
+        return YES;
+    }else
+        return NO;
+}
+
 
 #pragma mark - Private Method
-// 通过颜色生成图片
 - (UIImage *)xy_imageWithColor:(UIColor *)color {
     
     CGRect rect = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
@@ -345,6 +167,205 @@
         
     }
 }
+
+#pragma mark - set和get方法
+
+- (UIColor *)xy_titleColor {
+    
+    return _xy_titleColor ?: [UIColor blackColor];
+}
+
+- (void)setXy_titleColor:(UIColor *)xy_titleColor {
+    
+    _xy_titleColor = xy_titleColor;
+    [self.xy_titleView setTitleColor:xy_titleColor forState:UIControlStateNormal];
+}
+
+- (UIFont *)xy_buttonFont {
+    
+    return _xy_buttonFont ?: [UIFont systemFontOfSize:16];
+}
+- (UIColor *)xy_tintColor {
+    
+    return _xy_tintColor ?: [UIColor colorWithWhite:50/255.0 alpha:1.0];
+}
+
+- (void)setXy_title:(NSString *)xy_title {
+    
+    _xy_title = xy_title;
+    if (_xy_customTitleView) {
+        [_xy_customTitleView removeFromSuperview];
+        _xy_customTitleView = nil;
+    }
+    
+}
+
+- (NSString *)xy_title {
+    
+    return _xy_title ?: nil;
+    
+}
+
+- (BOOL)isHiddenLeftButton {
+    
+    return _hiddenLeftButton ?: NO;
+}
+
+- (void)setHiddenLeftButton:(BOOL)hiddenLeftButton {
+    _hiddenLeftButton = hiddenLeftButton;
+    self.leftButton.hidden = hiddenLeftButton;
+}
+
+- (void)setXy_customTitleView:(UIView *)xy_customTitleView {
+    
+    _xy_customTitleView = xy_customTitleView;
+    if (_xy_title || _xy_titleView) {
+        // 为了避免自定义的titleView与xy_titleView产生冲突
+        _xy_title = nil;
+        [_xy_titleView removeFromSuperview];
+        _xy_titleView = nil;
+    }
+    if (!xy_customTitleView.superview && ![xy_customTitleView.superview isEqual:self.topBackgroundView]) {
+        if ([xy_customTitleView isKindOfClass:[UILabel class]]) {
+            UILabel *label = (UILabel *)xy_customTitleView;
+            label.textAlignment = NSTextAlignmentCenter;
+        }
+        [self.topBackgroundView addSubview:xy_customTitleView];
+        xy_customTitleView.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    
+    
+}
+
+- (UIButton *)xy_titleView {
+    if (_xy_titleView == nil) {
+        UIButton *titleView = [UIButton buttonWithType:UIButtonTypeCustom];
+        [self.topBackgroundView addSubview:titleView];
+        [titleView setTitle:self.xy_title forState:UIControlStateNormal];
+        [titleView setTitleColor:self.xy_titleColor forState:UIControlStateNormal];
+        _xy_titleView = titleView;
+        titleView.translatesAutoresizingMaskIntoConstraints = NO;
+        return _xy_titleView;
+    } else {
+        [_xy_titleView setTitleColor:self.xy_titleColor forState:UIControlStateNormal];
+        return _xy_titleView;
+    }
+}
+
+
+- (void)setXy_titleView:(UIButton *)xy_titleView {
+    
+    _xy_titleView = xy_titleView;
+    [xy_titleView removeFromSuperview];
+    if (!xy_titleView.superview && ![xy_titleView.superview isEqual:self.topBackgroundView]) {
+        [self.topBackgroundView addSubview:xy_titleView];
+        xy_titleView.userInteractionEnabled = NO;
+        xy_titleView.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+}
+
+- (UIButton *)rightButton {
+    if (_rightButton) {
+        
+        [_rightButton setTitleColor:self.xy_tintColor forState:UIControlStateNormal];
+        _rightButton.titleLabel.font = self.xy_buttonFont;
+    }
+    return _rightButton;
+}
+
+- (void)setRightButton:(UIButton *)rightButton {
+    
+    _rightButton = rightButton;
+    [rightButton removeFromSuperview];
+    if (!rightButton.superview && ![rightButton.superview isEqual:self.topBackgroundView]) {
+        [self.topBackgroundView addSubview:rightButton];
+        rightButton.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    
+}
+
+
+
+- (UIControlState )xy_backBarState {
+    
+    return _xy_backBarState ?: UIControlStateNormal;
+}
+
+- (void)setXy_backBarImage:(UIImage *)xy_backBarImage {
+    
+    _xy_backBarImage = xy_backBarImage;
+    [self.leftButton setImage:xy_backBarImage forState:self.xy_backBarState];
+}
+
+- (void)setXy_backBarTitle:(NSString *)xy_backBarTitle {
+    
+    xy_backBarTitle = xy_backBarTitle;
+    
+    [self.leftButton setTitle:xy_backBarTitle forState:self.xy_backBarState];
+}
+
+- (NSString *)xy_backBarTitle {
+    
+    return _xy_backBarTitle ?: @"返回";
+}
+- (UIImage *)xy_backBarImage {
+    
+    return _xy_backBarImage ?: nil;
+}
+
+- (UIButton *)leftButton {
+    if (_leftButton == nil) {
+        UIButton *leftButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [leftButton setTitle:self.xy_backBarTitle forState:UIControlStateNormal];
+        [leftButton setImage:self.xy_backBarImage forState:UIControlStateNormal];
+        leftButton.titleLabel.font = self.xy_buttonFont;
+        [leftButton setTitleColor:self.xy_tintColor forState:UIControlStateNormal];
+        [leftButton setTitleColor:[UIColor redColor] forState:UIControlStateHighlighted];
+        [self.topBackgroundView addSubview:leftButton];
+        _leftButton = leftButton;
+        leftButton.hidden = self.isHiddenLeftButton;
+        leftButton.translatesAutoresizingMaskIntoConstraints = NO;
+        
+    }
+    return _leftButton;
+}
+
+
+- (UIImageView *)topBackgroundView {
+    
+    if (_topBackgroundView == nil) {
+        UIImageView *topBackgroundView = [[UIImageView alloc] init];
+        topBackgroundView.userInteractionEnabled = YES;
+        topBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.view addSubview:topBackgroundView];
+        [self.view bringSubviewToFront:topBackgroundView];
+        _topBackgroundView = topBackgroundView;
+    }
+    return _topBackgroundView;
+}
+
+- (UIImageView *)shadowLineView {
+    
+    if (_shadowLineView == nil) {
+        UIImageView *shadowLineView = [[UIImageView alloc] init];
+        shadowLineView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.topBackgroundView addSubview:shadowLineView];
+        [self.topBackgroundView bringSubviewToFront:shadowLineView];
+        _shadowLineView = shadowLineView;
+    }
+    return _shadowLineView;
+}
+
+- (void)xy_setBackBarTitle:(nullable NSString *)title titleColor:(UIColor *)color image:(nullable UIImage *)image forState:(UIControlState)state {
+    _xy_backBarTitle = title;
+    _xy_backBarImage = image;
+    _xy_backBarState = state;
+    [self.leftButton setTitle:title forState:state];
+    [self.leftButton setImage:image forState:state];
+    [self.leftButton setTitleColor:color forState:state];
+}
+
+
 
 - (void)dealloc {
     

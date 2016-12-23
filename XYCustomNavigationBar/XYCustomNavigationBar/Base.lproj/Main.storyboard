@@ -22,11 +22,19 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qIf-WR-FTj">
-                                <rect key="frame" x="97" y="289" width="46" height="30"/>
+                                <rect key="frame" x="103" y="289" width="34" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
+                                <state key="normal" title="push"/>
                                 <connections>
                                     <segue destination="idw-7E-wfN" kind="push" id="JNk-SH-iI7"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pao-fD-F9n">
+                                <rect key="frame" x="199" y="261" width="43" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="model"/>
+                                <connections>
+                                    <action selector="btnClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="EAc-yJ-CeQ"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -38,10 +46,10 @@
             </objects>
             <point key="canvasLocation" x="1076" y="137.18140929535232"/>
         </scene>
-        <!--Profile Base Controller-->
+        <!--Next View Controller-->
         <scene sceneID="9Yf-Er-UVc">
             <objects>
-                <viewController id="idw-7E-wfN" customClass="XYProfileBaseController" sceneMemberID="viewController">
+                <viewController id="idw-7E-wfN" customClass="XYNextViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="xGI-sT-sz8"/>
                         <viewControllerLayoutGuide type="bottom" id="EBg-CU-GUn"/>
@@ -67,10 +75,10 @@
             </objects>
             <point key="canvasLocation" x="1658" y="25"/>
         </scene>
-        <!--Profile Base Controller-->
+        <!--Next View Controller-->
         <scene sceneID="Q27-0x-XiI">
             <objects>
-                <viewController id="ONh-3t-ehD" customClass="XYProfileBaseController" sceneMemberID="viewController">
+                <viewController id="ONh-3t-ehD" customClass="XYNextViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="hjL-JZ-i3B"/>
                         <viewControllerLayoutGuide type="bottom" id="cf5-fO-48P"/>

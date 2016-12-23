@@ -9,32 +9,33 @@
 
 
 #import <UIKit/UIKit.h>
-
+#import "XYProfileNavigationController.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@interface XYProfileBaseController : UIViewController
-/** 导航条topBackgroundView */
-@property (nonatomic, strong, readonly) UIImageView *topBackgroundView;
-/** 导航条左侧返回按钮的文字， 当前导航控制器下全局有效 */
-//@property (nonatomic, copy) NSString *xy_globalBarTitle;
 
-/** 导航条右侧按钮 */
+@interface XYProfileBaseController : UIViewController
+
+@property (nonatomic, strong, readonly) UIImageView *topBackgroundView;
+
 @property (nonatomic, weak) UIButton *rightButton;
+
 /** 导航条自定义的titleView， 注意: 当设置了xy_customTitleView，属性title则无效 */
 @property (nonatomic, weak) UIView *xy_customTitleView;
+
 /** 导航条title , 注意: 当设置了xy_title，属性xy_customTitleView则无效 */
 @property (nonatomic, copy) NSString *xy_title;
-/** 导航条前景色，包括左侧按钮和右侧按钮文字颜色 */
+
+@property (nonatomic, strong) UIColor *xy_titleColor;
+
+/** 导航条左侧按钮和右侧按钮文字颜色 */
 @property (nonatomic, strong) UIColor *xy_tintColor;
+
 /** 导航条左侧和右侧按钮文字字体 */
 @property (nonatomic, strong) UIFont *xy_buttonFont;
 
 /** 是否隐藏导航条左侧按钮 */
 @property (nonatomic, assign, getter=isHiddenLeftButton) BOOL hiddenLeftButton;
 
-/**
- *  @explain 设置导航返回按钮的文字及图片
- */
 - (void)xy_setBackBarTitle:(nullable NSString *)title titleColor:(nullable UIColor *)color image:(nullable UIImage *)image forState:(UIControlState)state;
 
 /**

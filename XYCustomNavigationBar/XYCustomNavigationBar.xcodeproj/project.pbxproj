@@ -15,6 +15,7 @@
 		18586F541E0D480A0045F1C4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18586F521E0D480A0045F1C4 /* LaunchScreen.storyboard */; };
 		18586F601E0D481F0045F1C4 /* XYProfileBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18586F5D1E0D481F0045F1C4 /* XYProfileBaseController.m */; };
 		18586F611E0D481F0045F1C4 /* XYProfileNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18586F5F1E0D481F0045F1C4 /* XYProfileNavigationController.m */; };
+		18586F751E0D5C020045F1C4 /* XYNextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18586F741E0D5C020045F1C4 /* XYNextViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,8 @@
 		18586F5D1E0D481F0045F1C4 /* XYProfileBaseController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XYProfileBaseController.m; sourceTree = "<group>"; };
 		18586F5E1E0D481F0045F1C4 /* XYProfileNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XYProfileNavigationController.h; sourceTree = "<group>"; };
 		18586F5F1E0D481F0045F1C4 /* XYProfileNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XYProfileNavigationController.m; sourceTree = "<group>"; };
+		18586F731E0D5C020045F1C4 /* XYNextViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XYNextViewController.h; sourceTree = "<group>"; };
+		18586F741E0D5C020045F1C4 /* XYNextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XYNextViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +72,8 @@
 				18586F481E0D480A0045F1C4 /* AppDelegate.m */,
 				18586F4A1E0D480A0045F1C4 /* ViewController.h */,
 				18586F4B1E0D480A0045F1C4 /* ViewController.m */,
+				18586F731E0D5C020045F1C4 /* XYNextViewController.h */,
+				18586F741E0D5C020045F1C4 /* XYNextViewController.m */,
 				18586F4D1E0D480A0045F1C4 /* Main.storyboard */,
 				18586F501E0D480A0045F1C4 /* Assets.xcassets */,
 				18586F521E0D480A0045F1C4 /* LaunchScreen.storyboard */,
@@ -171,6 +176,7 @@
 			files = (
 				18586F4C1E0D480A0045F1C4 /* ViewController.m in Sources */,
 				18586F611E0D481F0045F1C4 /* XYProfileNavigationController.m in Sources */,
+				18586F751E0D5C020045F1C4 /* XYNextViewController.m in Sources */,
 				18586F601E0D481F0045F1C4 /* XYProfileBaseController.m in Sources */,
 				18586F491E0D480A0045F1C4 /* AppDelegate.m in Sources */,
 				18586F461E0D480A0045F1C4 /* main.m in Sources */,

@@ -8,7 +8,10 @@
 
 #import "ViewController.h"
 
-@interface ViewController ()
+@interface ViewController (){
+
+    UIImageView *_imageView;
+}
 
 @end
 
@@ -17,19 +20,29 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.topBackgroundView.backgroundColor = [UIColor colorWithRed:211/255.0 green:45/255.0 blue:160/255.0 alpha:0.8];
+    self.topBackgroundView.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
     self.xy_title = @"自定义的导航条";
-    
+    self.xy_titleColor = [UIColor whiteColor];
     // 设置右侧按钮
     self.rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.rightButton setTitle:@"右侧" forState:UIControlStateNormal];
+    
+    _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 64, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
+    _imageView.image = [UIImage imageNamed:@"1"];
+    [self.view insertSubview:_imageView atIndex:0];
 }
 
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (IBAction)btnClick:(id)sender {
+    
+    // model弹出
+    ViewController *vc = [ViewController new];
+    vc.view.backgroundColor = [UIColor whiteColor];
+    vc.xy_titleColor = [UIColor blackColor];
+    vc.xy_title = @"Model的";
+    vc.topBackgroundView.backgroundColor = [UIColor colorWithWhite:240/255.0 alpha:0.5];
+    XYProfileNavigationController *nav = [[XYProfileNavigationController alloc] initWithRootViewController:vc];
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
 
