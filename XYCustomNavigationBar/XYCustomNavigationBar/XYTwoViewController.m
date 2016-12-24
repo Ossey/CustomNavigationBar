@@ -40,13 +40,15 @@
     [back setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
     [back addTarget:self action:@selector(backClick:) forControlEvents:UIControlEventTouchDown];
 
+
 }
 
 - (void)backClick:(UIButton *)btn {
     
-    [self backCompletionHandle:^{
+    backCompletionHandle(^{
         [[[UIAlertView alloc] initWithTitle:@"退出啦" message:nil delegate:nil cancelButtonTitle:@"好的" otherButtonTitles:nil, nil] show];
-    }];
+    });
+
 }
 
 

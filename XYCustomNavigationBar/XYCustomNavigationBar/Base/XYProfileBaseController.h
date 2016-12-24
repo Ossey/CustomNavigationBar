@@ -12,6 +12,8 @@
 #import "XYProfileNavigationController.h"
 
 NS_ASSUME_NONNULL_BEGIN
+/** 返回完成的函数回调声明 */
+extern void backCompletionHandle(void(^ _Nullable backCallBack)());
 
 @interface XYProfileBaseController : UIViewController
 
@@ -44,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @explain 自定义顶部bar的左侧返回按钮的点击事件，注意: 非特殊情况下，请不要重写这个方法，不然会造成方法内部实现无效；
  *          此种情况需要重写此方法: 比如在modal的基础上push的控制器，需要重新此方法调用pop方法返回哦
  */
-- (void)backCompletionHandle:(nullable void(^)())block;
+//- (void)backCompletionHandle:(nullable void(^)())block;
 @end
 NS_ASSUME_NONNULL_END
 

@@ -22,6 +22,8 @@
 
 @implementation XYProfileBaseController
 
+static id obj;
+
 @synthesize rightButton = _rightButton;
 @synthesize xy_titleView = _xy_titleView;
 @synthesize xy_title = _xy_title;
@@ -37,6 +39,7 @@
     
     [self setupCustomBar];
     
+    obj = self;
     
 }
 
@@ -348,16 +351,25 @@
     self.shadowLineView.backgroundColor = [UIColor colorWithWhite:160/255.0 alpha:0.7];
     
     [self.leftButton addTarget:self action:@selector(leftBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    
+    
 }
 
 - (void)leftBtnClick:(UIButton *)btn {
     
-    [self backCompletionHandle:nil];
+    backCompletionHandle(nil);
+    
+    
+}
+
+void backCompletionHandle(void(^backCallBack)()) {
+   
+    [obj backCompletionHandle:backCallBack];
 }
 
 
 - (void)backCompletionHandle:(nullable void(^)())block {
-    
+
     if ([self isPresent]) {
         [self dismissViewControllerAnimated:YES completion:^{
             if (block) {

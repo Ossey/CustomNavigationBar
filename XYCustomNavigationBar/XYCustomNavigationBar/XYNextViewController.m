@@ -25,9 +25,10 @@
 }
 - (IBAction)backBtnClick:(id)sender {
     
-    [self backCompletionHandle:^{
+    backCompletionHandle(^{
         [[[UIAlertView alloc] initWithTitle:@"退出啦" message:nil delegate:nil cancelButtonTitle:@"好的" otherButtonTitles:nil, nil] show];
-    }];
+    });
+
 }
 
 - (void)didReceiveMemoryWarning {
