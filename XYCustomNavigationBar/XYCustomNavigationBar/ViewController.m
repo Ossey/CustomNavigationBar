@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "XYTwoViewController.h"
+#import "XYNextViewController.h"
 
 @interface ViewController (){
 
@@ -33,8 +34,20 @@
     
     _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.topBackgroundView.frame), CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
     _imageView.image = [UIImage imageNamed:@"1"];
-    [self.view insertSubview:_imageView atIndex:0];
+    [self.view addSubview:_imageView];
     
+    UIButton *modalBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.view addSubview:modalBtn];
+    [modalBtn setTitle:@"modal" forState:UIControlStateNormal];
+    modalBtn.frame = CGRectMake(100, 300, 300, 44);
+    [modalBtn addTarget:self action:@selector(btnClick:) forControlEvents:UIControlEventTouchDown];
+    
+    UIButton *pushBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.view addSubview:pushBtn];
+    [pushBtn setTitle:@"push" forState:UIControlStateNormal];
+    pushBtn.frame = CGRectMake(100, 400, 300, 44);
+    [pushBtn addTarget:self action:@selector(pushClick) forControlEvents:UIControlEventTouchDown];
+
 }
 
 
@@ -49,6 +62,12 @@
     XYTwoViewController *vc = [XYTwoViewController new];
     XYProfileNavigationController *nav = [[XYProfileNavigationController alloc] initWithRootViewController:vc];
     [self presentViewController:nav animated:YES completion:nil];
+}
+
+- (void)pushClick {
+    
+    XYNextViewController *nextVc = [XYNextViewController new];
+    [self.navigationController pushViewController:nextVc animated:YES];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {

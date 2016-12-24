@@ -46,6 +46,9 @@ static id obj;
     
     obj = self;
     
+    // 显示在最顶部，防止子控制器的view添加子控件时盖住了topBackgroundView
+    [self.view bringSubviewToFront:self.topBackgroundView];
+    
     // 控制model和push时左侧返回按钮的隐藏和显示
     if (self.presentedViewController) {
         if ([self.presentedViewController isKindOfClass:[UIViewController class]] && self.presentedViewController.navigationController.childViewControllers.count <= 1) {
