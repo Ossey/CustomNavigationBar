@@ -78,20 +78,31 @@
     
     self.shadowLineView.backgroundColor = [UIColor colorWithWhite:160/255.0 alpha:0.7];
     
-    [self.leftButton addTarget:self action:@selector(xy_leftButtonClick) forControlEvents:UIControlEventTouchUpInside];
+    [self.leftButton addTarget:self action:@selector(leftBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)leftBtnClick:(UIButton *)btn {
+
+    [self backCompletionHandle:nil];
 }
 
 
-
-- (void)xy_leftButtonClick {
+- (void)backCompletionHandle:(nullable void(^)())block {
     
     if ([self isModel]) {
-        [self dismissViewControllerAnimated:YES completion:nil];
-    }else
+        [self dismissViewControllerAnimated:YES completion:^{
+            if (block) {
+                block();
+            }
+        }];
+    }else {
+        
         [self.navigationController popViewControllerAnimated:YES];
-
+        if (block) {
+            block();
+        }
+    }
 }
-
 
 - (BOOL)isModel {
     

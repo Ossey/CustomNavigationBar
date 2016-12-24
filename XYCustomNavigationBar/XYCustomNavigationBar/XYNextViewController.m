@@ -23,10 +23,16 @@
     
     [self xy_setBackBarTitle:nil titleColor:nil image:[UIImage imageNamed:@"ChannelCategory_back"] forState:UIControlStateNormal];
 }
+- (IBAction)backBtnClick:(id)sender {
+    
+    [self backCompletionHandle:^{
+        [[[UIAlertView alloc] initWithTitle:@"退出啦" message:nil delegate:nil cancelButtonTitle:@"好的" otherButtonTitles:nil, nil] show];
+    }];
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    
 }
 
 /*

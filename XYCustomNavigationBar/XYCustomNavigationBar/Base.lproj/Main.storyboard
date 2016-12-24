@@ -59,11 +59,19 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zBO-Zs-nw8">
-                                <rect key="frame" x="164" y="333" width="46" height="30"/>
+                                <rect key="frame" x="170" y="333" width="34" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
+                                <state key="normal" title="push"/>
                                 <connections>
                                     <segue destination="ONh-3t-ehD" kind="push" id="r4E-pV-aA9"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b22-mA-7iF">
+                                <rect key="frame" x="176" y="399" width="34" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="back"/>
+                                <connections>
+                                    <action selector="backBtnClick:" destination="idw-7E-wfN" eventType="touchUpInside" id="1Wq-DK-x9z"/>
                                 </connections>
                             </button>
                         </subviews>
