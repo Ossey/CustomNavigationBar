@@ -21,7 +21,6 @@
 @end
 
 @implementation XYProfileBaseController
-
 static id obj;
 
 @synthesize rightButton = _rightButton;
@@ -39,13 +38,13 @@ static id obj;
     
     [self setupCustomBar];
     
-    obj = self;
-    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     
     [super viewWillAppear:animated];
+    
+    obj = self;
     
     // 控制model和push时左侧返回按钮的隐藏和显示
     if (self.presentedViewController) {
@@ -70,12 +69,6 @@ static id obj;
     
     [self makeConstr];
     
-}
-
-// 判断当前控制器是否正在显示
-- (BOOL)isCurrentViewControllerVisible:(UIViewController *)viewController
-{
-    return (viewController.isViewLoaded && viewController.view.window);
 }
 
 #pragma mark - set和get方法
@@ -358,26 +351,24 @@ static id obj;
 - (void)leftBtnClick:(UIButton *)btn {
     
     backCompletionHandle(nil);
-    
-    
 }
 
-void backCompletionHandle(void(^backCallBack)()) {
+void backCompletionHandle(void(^callBack)()) {
    
-    [obj backCompletionHandle:backCallBack];
+    [obj backCompletionHandle:callBack];
 }
 
 
 - (void)backCompletionHandle:(nullable void(^)())block {
 
-    if ([self isPresent]) {
-        [self dismissViewControllerAnimated:YES completion:^{
+    if ([obj isPresent]) {
+        [obj dismissViewControllerAnimated:YES completion:^{
             if (block) {
                 block();
             }
         }];
     }else {
-        [self.navigationController popViewControllerAnimated:YES];
+        [[obj navigationController] popViewControllerAnimated:YES];
 
         if (block) {
             block();
@@ -419,6 +410,12 @@ void backCompletionHandle(void(^backCallBack)()) {
     return image;
 }
 
+
+// 判断当前控制器是否正在显示
+- (BOOL)isCurrentViewControllerVisible:(UIViewController *)viewController
+{
+    return (viewController.isViewLoaded && viewController.view.window);
+}
 
 
 - (void)dealloc {

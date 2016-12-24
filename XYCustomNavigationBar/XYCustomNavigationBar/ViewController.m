@@ -34,6 +34,7 @@
     _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.topBackgroundView.frame), CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
     _imageView.image = [UIImage imageNamed:@"1"];
     [self.view insertSubview:_imageView atIndex:0];
+    
 }
 
 

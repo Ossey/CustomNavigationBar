@@ -12,8 +12,8 @@
 #import "XYProfileNavigationController.h"
 
 NS_ASSUME_NONNULL_BEGIN
-/** 返回完成的函数回调声明 */
-extern void backCompletionHandle(void(^ _Nullable backCallBack)());
+/** 返回完成函数回调的声明 */
+extern void backCompletionHandle(void(^ _Nullable callBack)());
 
 @interface XYProfileBaseController : UIViewController
 
