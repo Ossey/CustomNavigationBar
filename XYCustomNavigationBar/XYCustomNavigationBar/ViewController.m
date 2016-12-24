@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "XYTwoViewController.h"
 
 @interface ViewController (){
 
@@ -28,23 +29,24 @@
     // 设置右侧按钮
     self.rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.rightButton setTitle:@"右侧" forState:UIControlStateNormal];
+    [self.rightButton addTarget:self action:@selector(rightButtonClick) forControlEvents:UIControlEventTouchDown];
     
     _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.topBackgroundView.frame), CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
     _imageView.image = [UIImage imageNamed:@"1"];
     [self.view insertSubview:_imageView atIndex:0];
 }
 
+
+- (void)rightButtonClick {
+    
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"知道了" message:nil delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:nil, nil];
+    [alertView show];
+}
+
 - (IBAction)btnClick:(id)sender {
     
     // model弹出
-    ViewController *vc = [ViewController new];
-    vc.view.backgroundColor = [UIColor whiteColor];
-    vc.xy_titleColor = [UIColor blackColor];
-    vc.xy_title = @"Model的";
-    vc.xy_tintColor = [UIColor whiteColor];
-    vc.xy_titleColor = [UIColor whiteColor];
-    vc.shadowLineView.backgroundColor = [UIColor clearColor];
-    vc.topBackgroundView.backgroundColor = [UIColor colorWithWhite:80/255.0 alpha:0.5];
+    XYTwoViewController *vc = [XYTwoViewController new];
     XYProfileNavigationController *nav = [[XYProfileNavigationController alloc] initWithRootViewController:vc];
     [self presentViewController:nav animated:YES completion:nil];
 }

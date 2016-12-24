@@ -10,8 +10,8 @@
 
 @interface XYProfileBaseController ()
 
-@property (nonatomic, strong) UIImageView *topBackgroundView; // 导航条topBackgroundView
-@property (nonatomic, strong) UIImageView *shadowLineView;    // 导航条阴影线
+@property (nonatomic, strong) UIView *topBackgroundView;     // 导航条topBackgroundView
+@property (nonatomic, strong) UIView *shadowLineView;        // 导航条阴影线
 @property (nonatomic, strong) UIImage *xy_backBarImage;      // 导航条左侧返回按钮的图片
 @property (nonatomic, assign) UIControlState xy_backBarState; // 导航条左侧返回按钮的状态
 @property (nonatomic, weak) UIButton *leftButton;            // 导航条左侧按钮
@@ -40,34 +40,25 @@
     
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    
-    [super viewDidAppear:animated];
-    
-//    if ([self isModel]) {
-//        self.hiddenLeftButton = NO;
-//        return;
-//    }
-//    if (self.navigationController.childViewControllers.count <= 1) {
-//        self.hiddenLeftButton = YES;
-//    } else {
-//        self.hiddenLeftButton = NO;
-//    }
-}
-
 - (void)viewWillAppear:(BOOL)animated {
     
     [super viewWillAppear:animated];
     
-    if ([self isModel]) {
+    // 控制model和push时左侧返回按钮的隐藏和显示
+    if (self.presentedViewController) {
+        if ([self.presentedViewController isKindOfClass:[UIViewController class]] && self.presentedViewController.navigationController.childViewControllers.count <= 1) {
+            self.hiddenLeftButton = YES;
+        } else if ([self.presentedViewController isKindOfClass:[UINavigationController class]] && self.childViewControllers.count <= 1) {
+            self.hiddenLeftButton = YES;
+        }
+    } else if (self.presentingViewController) {
         self.hiddenLeftButton = NO;
-        return;
-    }
-    if (self.navigationController.childViewControllers.count <= 1) {
+    } else if (!self.presentedViewController && self.navigationController.childViewControllers.count <= 1) {
         self.hiddenLeftButton = YES;
     } else {
         self.hiddenLeftButton = NO;
     }
+        
 }
 
 - (void)viewWillLayoutSubviews {
@@ -354,10 +345,10 @@
 }
 
 
-- (UIImageView *)topBackgroundView {
+- (UIView *)topBackgroundView {
     
     if (_topBackgroundView == nil) {
-        UIImageView *topBackgroundView = [[UIImageView alloc] init];
+        UIView *topBackgroundView = [[UIView alloc] init];
         topBackgroundView.userInteractionEnabled = YES;
         topBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
         [self.view addSubview:topBackgroundView];
@@ -367,10 +358,10 @@
     return _topBackgroundView;
 }
 
-- (UIImageView *)shadowLineView {
+- (UIView *)shadowLineView {
     
     if (_shadowLineView == nil) {
-        UIImageView *shadowLineView = [[UIImageView alloc] init];
+        UIView *shadowLineView = [[UIView alloc] init];
         shadowLineView.translatesAutoresizingMaskIntoConstraints = NO;
         [self.topBackgroundView addSubview:shadowLineView];
         [self.topBackgroundView bringSubviewToFront:shadowLineView];

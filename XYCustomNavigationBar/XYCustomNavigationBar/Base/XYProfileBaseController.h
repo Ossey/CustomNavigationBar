@@ -15,9 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface XYProfileBaseController : UIViewController
 
-@property (nonatomic, strong, readonly) UIImageView *topBackgroundView;
+@property (nonatomic, strong, readonly) UIView *topBackgroundView;
 
-@property (nonatomic, strong, readonly) UIImageView *shadowLineView;    // 导航条阴影线
+@property (nonatomic, strong, readonly) UIView *shadowLineView;
 
 @property (nonatomic, weak) UIButton *rightButton;
 
@@ -35,8 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 /** 导航条左侧和右侧按钮文字字体 */
 @property (nonatomic, strong) UIFont *xy_buttonFont;
 
-/** 是否隐藏导航条左侧按钮 */
-@property (nonatomic, assign, getter=isHiddenLeftButton) BOOL hiddenLeftButton; // 默认隐藏
+/** 是否隐藏导航条左侧按钮，默认隐藏 */
+@property (nonatomic, assign, getter=isHiddenLeftButton) BOOL hiddenLeftButton;
 
 - (void)xy_setBackBarTitle:(nullable NSString *)title titleColor:(nullable UIColor *)color image:(nullable UIImage *)image forState:(UIControlState)state;
 

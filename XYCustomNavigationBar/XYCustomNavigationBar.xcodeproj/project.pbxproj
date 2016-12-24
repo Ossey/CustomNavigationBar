@@ -16,6 +16,7 @@
 		18586F601E0D481F0045F1C4 /* XYProfileBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18586F5D1E0D481F0045F1C4 /* XYProfileBaseController.m */; };
 		18586F611E0D481F0045F1C4 /* XYProfileNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18586F5F1E0D481F0045F1C4 /* XYProfileNavigationController.m */; };
 		18586F751E0D5C020045F1C4 /* XYNextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18586F741E0D5C020045F1C4 /* XYNextViewController.m */; };
+		189FB0BE1E0DFA5F00B270A7 /* XYTwoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 189FB0BD1E0DFA5F00B270A7 /* XYTwoViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,8 @@
 		18586F5F1E0D481F0045F1C4 /* XYProfileNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XYProfileNavigationController.m; sourceTree = "<group>"; };
 		18586F731E0D5C020045F1C4 /* XYNextViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XYNextViewController.h; sourceTree = "<group>"; };
 		18586F741E0D5C020045F1C4 /* XYNextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XYNextViewController.m; sourceTree = "<group>"; };
+		189FB0BC1E0DFA5F00B270A7 /* XYTwoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XYTwoViewController.h; sourceTree = "<group>"; };
+		189FB0BD1E0DFA5F00B270A7 /* XYTwoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XYTwoViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +77,8 @@
 				18586F4B1E0D480A0045F1C4 /* ViewController.m */,
 				18586F731E0D5C020045F1C4 /* XYNextViewController.h */,
 				18586F741E0D5C020045F1C4 /* XYNextViewController.m */,
+				189FB0BC1E0DFA5F00B270A7 /* XYTwoViewController.h */,
+				189FB0BD1E0DFA5F00B270A7 /* XYTwoViewController.m */,
 				18586F4D1E0D480A0045F1C4 /* Main.storyboard */,
 				18586F501E0D480A0045F1C4 /* Assets.xcassets */,
 				18586F521E0D480A0045F1C4 /* LaunchScreen.storyboard */,
@@ -175,6 +180,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				18586F4C1E0D480A0045F1C4 /* ViewController.m in Sources */,
+				189FB0BE1E0DFA5F00B270A7 /* XYTwoViewController.m in Sources */,
 				18586F611E0D481F0045F1C4 /* XYProfileNavigationController.m in Sources */,
 				18586F751E0D5C020045F1C4 /* XYNextViewController.m in Sources */,
 				18586F601E0D481F0045F1C4 /* XYProfileBaseController.m in Sources */,
