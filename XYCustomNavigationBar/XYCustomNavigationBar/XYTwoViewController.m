@@ -20,7 +20,7 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     self.xy_titleColor = [UIColor blackColor];
-    self.xy_title = @"Model";
+    self.xy_title = @"标题";
     self.xy_tintColor = [UIColor whiteColor];
     self.xy_titleColor = [UIColor whiteColor];
     self.shadowLineView.backgroundColor = [UIColor clearColor];
@@ -33,7 +33,19 @@
     [btn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
     [btn addTarget:self action:@selector(jumpToNext) forControlEvents:UIControlEventTouchDown];
     
+    UIButton *back = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.view addSubview:back];
+    back.frame = CGRectMake(100, 300, 200, 40);
+    [back setTitle:@"back" forState:UIControlStateNormal];
+    [back setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
+    [back addTarget:self action:@selector(backClick:) forControlEvents:UIControlEventTouchDown];
 
+}
+- (UIButton *)backClick:(id)sender {
+    
+    [self backCompletionHandle:^{
+        [[[UIAlertView alloc] initWithTitle:@"退出啦" message:nil delegate:nil cancelButtonTitle:@"好的" otherButtonTitles:nil, nil] show];
+    }];
 }
 
 - (void)jumpToNext {
@@ -43,14 +55,6 @@
     [self.navigationController pushViewController:next animated:YES];
 }
 
-/*
-#pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

@@ -69,7 +69,6 @@
     
 }
 
-
 // 判断当前控制器是否正在显示
 - (BOOL)isCurrentViewControllerVisible:(UIViewController *)viewController
 {
@@ -359,27 +358,39 @@
 
 - (void)backCompletionHandle:(nullable void(^)())block {
     
-    if ([self isModel]) {
+    if ([self isPresent]) {
         [self dismissViewControllerAnimated:YES completion:^{
             if (block) {
                 block();
             }
         }];
     }else {
-        
         [self.navigationController popViewControllerAnimated:YES];
+
         if (block) {
             block();
         }
     }
+    
 }
 
-- (BOOL)isModel {
+- (BOOL)isPresent {
     
-    if (self.presentedViewController || self.presentingViewController) {
-        return YES;
-    }else
-        return NO;
+    BOOL isPresent;
+    
+    NSArray *viewcontrollers = self.navigationController.viewControllers;
+    
+    if (viewcontrollers.count > 1) {
+        if ([viewcontrollers objectAtIndex:viewcontrollers.count - 1] == self) {
+            
+            isPresent = NO; //push方式
+        }
+    }
+    else{
+        isPresent = YES;  // modal方式
+    }
+    
+    return isPresent;
 }
 
 

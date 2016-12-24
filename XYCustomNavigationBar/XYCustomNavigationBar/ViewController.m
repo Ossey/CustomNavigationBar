@@ -45,7 +45,6 @@
 
 - (IBAction)btnClick:(id)sender {
     
-    // model弹出
     XYTwoViewController *vc = [XYTwoViewController new];
     XYProfileNavigationController *nav = [[XYProfileNavigationController alloc] initWithRootViewController:vc];
     [self presentViewController:nav animated:YES completion:nil];
