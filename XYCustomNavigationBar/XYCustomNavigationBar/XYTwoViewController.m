@@ -38,11 +38,11 @@
     back.frame = CGRectMake(100, 300, 200, 40);
     [back setTitle:@"back" forState:UIControlStateNormal];
     [back setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-    [back addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchDown];
+    [back addTarget:self action:@selector(backClick:) forControlEvents:UIControlEventTouchDown];
 
 }
 
-- (void)backClick {
+- (void)backClick:(UIButton *)btn {
     
     [self backCompletionHandle:^{
         [[[UIAlertView alloc] initWithTitle:@"退出啦" message:nil delegate:nil cancelButtonTitle:@"好的" otherButtonTitles:nil, nil] show];
