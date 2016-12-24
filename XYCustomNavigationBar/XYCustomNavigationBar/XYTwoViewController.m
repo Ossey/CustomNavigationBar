@@ -20,7 +20,7 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     self.xy_titleColor = [UIColor blackColor];
-    self.xy_title = @"Model的";
+    self.xy_title = @"Model";
     self.xy_tintColor = [UIColor whiteColor];
     self.xy_titleColor = [UIColor whiteColor];
     self.shadowLineView.backgroundColor = [UIColor clearColor];
@@ -32,6 +32,8 @@
     [btn setTitle:@"跳转" forState:UIControlStateNormal];
     [btn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
     [btn addTarget:self action:@selector(jumpToNext) forControlEvents:UIControlEventTouchDown];
+    
+
 }
 
 - (void)jumpToNext {

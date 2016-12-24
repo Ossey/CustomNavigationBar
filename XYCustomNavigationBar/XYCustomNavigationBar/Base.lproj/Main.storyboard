@@ -75,10 +75,10 @@
             </objects>
             <point key="canvasLocation" x="1658" y="25"/>
         </scene>
-        <!--Next View Controller-->
+        <!--Two View Controller-->
         <scene sceneID="Q27-0x-XiI">
             <objects>
-                <viewController id="ONh-3t-ehD" customClass="XYNextViewController" sceneMemberID="viewController">
+                <viewController id="ONh-3t-ehD" customClass="XYTwoViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="hjL-JZ-i3B"/>
                         <viewControllerLayoutGuide type="bottom" id="cf5-fO-48P"/>

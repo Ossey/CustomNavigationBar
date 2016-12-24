@@ -207,6 +207,8 @@
 - (void)setXy_title:(NSString *)xy_title {
     
     _xy_title = xy_title;
+    [self.xy_titleView setTitle:xy_title forState:UIControlStateNormal];
+    
     if (_xy_customTitleView) {
         [_xy_customTitleView removeFromSuperview];
         _xy_customTitleView = nil;
@@ -246,6 +248,11 @@
         }
         [self.topBackgroundView addSubview:xy_customTitleView];
         xy_customTitleView.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    
+    if ([xy_customTitleView isKindOfClass:[UIImageView class]]) {
+        UIImageView *imgView = (UIImageView *)xy_customTitleView;
+        imgView.contentMode = UIViewContentModeCenter;
     }
     
     
@@ -328,6 +335,7 @@
 }
 
 - (UIButton *)leftButton {
+    
     if (_leftButton == nil) {
         UIButton *leftButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [leftButton setTitle:self.xy_backBarTitle forState:UIControlStateNormal];
@@ -339,7 +347,6 @@
         _leftButton = leftButton;
         leftButton.hidden = self.isHiddenLeftButton;
         leftButton.translatesAutoresizingMaskIntoConstraints = NO;
-        
     }
     return _leftButton;
 }
@@ -371,6 +378,7 @@
 }
 
 - (void)xy_setBackBarTitle:(nullable NSString *)title titleColor:(UIColor *)color image:(nullable UIImage *)image forState:(UIControlState)state {
+    
     _xy_backBarTitle = title;
     _xy_backBarImage = image;
     _xy_backBarState = state;
