@@ -22,17 +22,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.topBackgroundView.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
+    self.xy_topBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
     self.xy_title = @"自定义的导航条";
     self.xy_titleColor = [UIColor whiteColor];
     
     // 设置右侧按钮
-    self.rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.rightButton setTitle:@"右侧" forState:UIControlStateNormal];
-    [self.rightButton addTarget:self action:@selector(rightButtonClick) forControlEvents:UIControlEventTouchDown];
+    self.xy_rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.xy_rightButton setTitle:@"右侧" forState:UIControlStateNormal];
+    [self.xy_rightButton addTarget:self action:@selector(rightButtonClick) forControlEvents:UIControlEventTouchDown];
     
-    _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.topBackgroundView.frame), CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
+    _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.xy_topBar.frame), CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
     _imageView.image = [UIImage imageNamed:@"1"];
     [self.view addSubview:_imageView];
     
@@ -60,7 +60,7 @@
 - (IBAction)btnClick:(id)sender {
     
     XYTwoViewController *vc = [XYTwoViewController new];
-    XYProfileNavigationController *nav = [[XYProfileNavigationController alloc] initWithRootViewController:vc];
+    XYCustomNavController *nav = [[XYCustomNavController alloc] initWithRootViewController:vc];
     [self presentViewController:nav animated:YES completion:nil];
 }
 

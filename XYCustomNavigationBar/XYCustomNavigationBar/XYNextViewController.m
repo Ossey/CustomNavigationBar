@@ -19,7 +19,7 @@
     
     UIImageView *imgView = [[UIImageView alloc] init];
     imgView.image = [UIImage imageNamed:@"title_image"];
-    self.xy_customTitleView = imgView;
+    self.xy_titleView = imgView;
     
     [self xy_setBackBarTitle:nil titleColor:nil image:[UIImage imageNamed:@"ChannelCategory_back"] forState:UIControlStateNormal];
 }

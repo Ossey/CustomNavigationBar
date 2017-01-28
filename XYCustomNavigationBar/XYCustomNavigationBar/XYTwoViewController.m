@@ -24,7 +24,7 @@
     self.xy_tintColor = [UIColor whiteColor];
     self.xy_titleColor = [UIColor whiteColor];
     self.shadowLineView.backgroundColor = [UIColor clearColor];
-    self.topBackgroundView.backgroundColor = [UIColor colorWithWhite:80/255.0 alpha:0.5];
+    self.xy_topBar.backgroundColor = [UIColor colorWithWhite:80/255.0 alpha:0.5];
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.view addSubview:btn];
