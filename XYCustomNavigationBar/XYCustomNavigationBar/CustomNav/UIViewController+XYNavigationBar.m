@@ -405,6 +405,28 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
     [self.leftButton setTitleColor:color forState:state];
 }
 
+- (BOOL)canShowLeftButton {
+    if ([_leftButton titleForState:UIControlStateNormal] || [_leftButton attributedTitleForState:UIControlStateNormal].string.length > 0 || [_leftButton imageForState:UIControlStateNormal]) {
+        return _leftButton.superview != nil;
+    }
+    return NO;
+}
+
+- (BOOL)canShowTitleButton {
+    if ([_xy_titleButton titleForState:UIControlStateNormal] || [_xy_titleButton attributedTitleForState:UIControlStateNormal].string.length > 0 || [_xy_titleButton imageForState:UIControlStateNormal]) {
+        return _xy_titleButton.superview != nil;
+    }
+    return NO;
+}
+
+- (BOOL)canShowTitleView {
+    if (_xy_titleView.superview) {
+        return YES;
+    }
+    return NO;
+}
+
+
 #pragma mark - Private (auto layout)
 - (void)updateConstraints {
     [super updateConstraints];
@@ -418,16 +440,20 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
     [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_shadowLineView]|" options:kNilOptions metrics:metrics views:views]];
     [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_shadowLineView(0.5)]|" options:kNilOptions metrics:metrics views:views]];
     
-    if (self.leftButton && self.leftButton.superview) {
+    if ([self canShowTitleButton]) {
         NSDictionary *views = NSDictionaryOfVariableBindings(_leftButton);
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-leftButtonLeftM-[_leftButton(<=leftButtonMaxW)]" options:kNilOptions metrics:metrics views:views]];
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_leftButton(leftBtnH)]|" options:kNilOptions metrics:metrics views:views]];
     }
     
-    if (self.xy_rightButton && self.xy_rightButton.superview) {
+    if ([self canShowLeftButton]) {
         NSDictionary *views = NSDictionaryOfVariableBindings(_xy_rightButton);
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[_xy_rightButton(<=leftButtonMaxW)]-rightBtnRightM-|" options:kNilOptions metrics:metrics views:views]];
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_xy_rightButton(rightBtnH)]|" options:kNilOptions metrics:metrics views:views]];
+    }
+    else {
+        [_leftButton removeFromSuperview];
+        _leftButton = nil;
     }
     
     if (self.xy_titleButton && self.xy_titleButton.superview) {
@@ -436,13 +462,21 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
         [self.xy_topBar addConstraint:[NSLayoutConstraint constraintWithItem:self.xy_titleButton attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:kNilOptions attribute:kNilOptions multiplier:0.0 constant:150]];
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_xy_titleButton(rightBtnH)]|" options:kNilOptions metrics:metrics views:views]];
     }
+    else {
+        [_xy_titleButton removeFromSuperview];
+        _xy_titleButton = nil;
+    }
     
-    if (self.xy_titleView && self.xy_titleView.superview) {
+    if ([self canShowTitleView]) {
         NSDictionary *views = NSDictionaryOfVariableBindings(_xy_titleView);
         [self.xy_topBar addConstraint:[NSLayoutConstraint constraintWithItem:self.xy_titleView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.xy_topBar attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0]];
         [self.xy_topBar addConstraint:[NSLayoutConstraint constraintWithItem:self.xy_titleView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:kNilOptions attribute:kNilOptions multiplier:0.0 constant:150]];
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_xy_titleView(rightBtnH)]|" options:kNilOptions metrics:metrics views:views]];
         
+    }
+    else {
+        [_xy_titleView removeFromSuperview];
+        _xy_titleView = nil;
     }
 }
 
