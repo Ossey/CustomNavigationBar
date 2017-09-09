@@ -19,15 +19,15 @@
     
     UIImageView *imgView = [[UIImageView alloc] init];
     imgView.image = [UIImage imageNamed:@"title_image"];
-    self.xy_titleView = imgView;
+    self.xy_navigationBar.xy_titleView = imgView;
     
-    [self xy_setBackBarTitle:nil titleColor:nil image:[UIImage imageNamed:@"ChannelCategory_back"] forState:UIControlStateNormal];
+    [self.xy_navigationBar xy_setBackBarTitle:nil titleColor:nil image:[UIImage imageNamed:@"ChannelCategory_back"] forState:UIControlStateNormal];
 }
 - (IBAction)backBtnClick:(id)sender {
     
-    backCompletionHandle(^{
-        [[[UIAlertView alloc] initWithTitle:@"退出啦" message:nil delegate:nil cancelButtonTitle:@"好的" otherButtonTitles:nil, nil] show];
-    });
+//    backCompletionHandle(^{
+//        [[[UIAlertView alloc] initWithTitle:@"退出啦" message:nil delegate:nil cancelButtonTitle:@"好的" otherButtonTitles:nil, nil] show];
+//    });
 
 }
 

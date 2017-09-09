@@ -22,17 +22,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.xy_topBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
+    self.xy_navigationBar.xy_topBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
-    self.xy_title = @"自定义的导航条";
-    self.xy_titleColor = [UIColor whiteColor];
+    self.xy_navigationBar.xy_title = @"自定义的导航条";
+    self.xy_navigationBar.xy_titleColor = [UIColor whiteColor];
     
     // 设置右侧按钮
-    self.xy_rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.xy_rightButton setTitle:@"右侧" forState:UIControlStateNormal];
-    [self.xy_rightButton addTarget:self action:@selector(rightButtonClick) forControlEvents:UIControlEventTouchDown];
+    self.xy_navigationBar.xy_rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.xy_navigationBar.xy_rightButton setTitle:@"右侧" forState:UIControlStateNormal];
+    [self.xy_navigationBar.xy_rightButton addTarget:self action:@selector(rightButtonClick) forControlEvents:UIControlEventTouchDown];
     
-    _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.xy_topBar.frame), CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
+    _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.xy_navigationBar.xy_topBar.frame), CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
     _imageView.image = [UIImage imageNamed:@"1"];
     [self.view addSubview:_imageView];
     

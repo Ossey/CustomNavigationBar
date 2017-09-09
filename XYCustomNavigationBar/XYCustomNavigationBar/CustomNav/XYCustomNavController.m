@@ -45,9 +45,9 @@
 - (void)pushViewController:(XYProfileBaseController *)viewController animated:(BOOL)animated {
 
     if ([viewController isKindOfClass:[XYProfileBaseController class]]) {
-        if (viewController.isHiddenLeftButton) {
+        if (viewController.xy_navigationBar.isHiddenLeftButton) {
             
-            viewController.hiddenLeftButton = self.childViewControllers.count < 1;
+            viewController.xy_navigationBar.hiddenLeftButton = self.childViewControllers.count < 1;
         }
         if (self.childViewControllers.count) {
             viewController.hidesBottomBarWhenPushed = YES;
