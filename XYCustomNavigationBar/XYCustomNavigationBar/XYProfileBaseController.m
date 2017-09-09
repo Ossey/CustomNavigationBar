@@ -35,11 +35,15 @@
         } else if ([self.presentedViewController isKindOfClass:[UINavigationController class]] && self.childViewControllers.count <= 1) {
             self.xy_navigationBar.hiddenLeftButton = YES;
         }
-    } else if (self.presentingViewController) {
+    }
+    else if (self.presentingViewController) {
         self.xy_navigationBar.hiddenLeftButton = NO;
-    } else if (!self.presentedViewController && self.navigationController.childViewControllers.count <= 1) {
+    }
+    else if (!self.presentedViewController &&
+             self.navigationController.childViewControllers.count <= 1) {
         self.xy_navigationBar.hiddenLeftButton = YES;
-    } else {
+    }
+    else {
         self.xy_navigationBar.hiddenLeftButton = NO;
     }
     
@@ -47,9 +51,8 @@
 }
 
 
-// 判断当前控制器是否正在显示
-- (BOOL)isCurrentViewControllerVisible:(UIViewController *)viewController
-{
+// 当前控制器是否正在显示
+- (BOOL)isCurrentViewControllerVisible:(UIViewController *)viewController {
     return (viewController.isViewLoaded && viewController.view.window);
 }
 

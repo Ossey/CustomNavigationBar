@@ -93,11 +93,11 @@
 
 - (void)xy_updateViewConstraints {
     CGFloat navigationBarHeight = 0.0;
-    if ([UIDevice currentDevice].orientation == UIInterfaceOrientationPortrait) {
-        navigationBarHeight = 64;
+    if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)) {
+        navigationBarHeight = 44;
     }
     else {
-        navigationBarHeight = 44;
+        navigationBarHeight = 64;
     }
     
     NSInteger foundIndex = [self.view.constraints indexOfObjectPassingTest:^BOOL(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -402,6 +402,10 @@
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-leftButtonLeftM-[_leftButton(<=leftButtonMaxW)]" options:kNilOptions metrics:metrics views:views]];
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_leftButton(leftBtnH)]|" options:kNilOptions metrics:metrics views:views]];
     }
+    else {
+        [_leftButton removeFromSuperview];
+        _leftButton = nil;
+    }
     
     if ([self canshowRightButton]) {
         NSDictionary *views = NSDictionaryOfVariableBindings(_xy_rightButton);
@@ -409,8 +413,8 @@
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_xy_rightButton(rightBtnH)]|" options:kNilOptions metrics:metrics views:views]];
     }
     else {
-        [_leftButton removeFromSuperview];
-        _leftButton = nil;
+        [_xy_rightButton removeFromSuperview];
+        _xy_rightButton = nil;
     }
     
     if ([self canShowTitleButton]) {

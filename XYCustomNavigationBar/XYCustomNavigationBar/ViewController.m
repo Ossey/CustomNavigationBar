@@ -27,20 +27,6 @@
     self.xy_navigationBar.xy_rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.xy_navigationBar.xy_rightButton setTitle:@"右侧" forState:UIControlStateNormal];
     [self.xy_navigationBar.xy_rightButton addTarget:self action:@selector(rightButtonClick) forControlEvents:UIControlEventTouchDown];
-    
-    UIButton *modalBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [modalBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [self.view addSubview:modalBtn];
-    [modalBtn setTitle:@"modal" forState:UIControlStateNormal];
-    modalBtn.frame = CGRectMake(100, 300, 300, 44);
-    [modalBtn addTarget:self action:@selector(btnClick:) forControlEvents:UIControlEventTouchDown];
-    
-    UIButton *pushBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [pushBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [self.view addSubview:pushBtn];
-    [pushBtn setTitle:@"push" forState:UIControlStateNormal];
-    pushBtn.frame = CGRectMake(100, 400, 300, 44);
-    [pushBtn addTarget:self action:@selector(pushClick) forControlEvents:UIControlEventTouchDown];
 
 }
 
@@ -51,17 +37,22 @@
     [alertView show];
 }
 
-- (IBAction)btnClick:(id)sender {
+- (IBAction)modalBtnClick:(id)sender {
     Test1ViewController *nextVc = [Test1ViewController new];
     nextVc.view.backgroundColor = [UIColor whiteColor];
     nextVc.xy_navigationBar.xy_topBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
     nextVc.xy_navigationBar.xy_title = @"自定义的导航条";
+    [self.xy_navigationBar xy_setBackBarTitle:@"back" titleColor:[UIColor blueColor] image:nil forState:UIControlStateNormal];
     nextVc.xy_navigationBar.xy_titleColor = [UIColor whiteColor];
+    __weak typeof(nextVc) selfVc = nextVc;
+    nextVc.xy_navigationBar.backCompletionHandle = ^{
+        [selfVc backBtnClick];
+    };
     [self showDetailViewController:nextVc sender:self];
 }
 
-- (void)pushClick {
+- (IBAction)pushClick:(id)sender {
     
     Test1ViewController *nextVc = [Test1ViewController new];
     nextVc.view.backgroundColor = [UIColor whiteColor];
