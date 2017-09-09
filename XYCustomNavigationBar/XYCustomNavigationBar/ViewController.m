@@ -18,7 +18,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.xy_navigationBar.contentView.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
+    self.xy_navigationBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
     self.xy_navigationBar.title = @"自定义的导航条";
     self.xy_navigationBar.titleColor = [UIColor whiteColor];
@@ -40,15 +40,11 @@
 - (IBAction)modalBtnClick:(id)sender {
     Test1ViewController *nextVc = [Test1ViewController new];
     nextVc.view.backgroundColor = [UIColor whiteColor];
-    nextVc.xy_navigationBar.contentView.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
+    nextVc.xy_navigationBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
     nextVc.xy_navigationBar.title = @"自定义的导航条";
-    [self.xy_navigationBar setBackBarTitle:@"back" titleColor:[UIColor blueColor] image:nil forState:UIControlStateNormal];
+    [self.xy_navigationBar setLeftButtonTitle:@"back" image:nil forState:UIControlStateNormal];
     nextVc.xy_navigationBar.titleColor = [UIColor whiteColor];
-    __weak typeof(nextVc) selfVc = nextVc;
-//    nextVc.xy_navigationBar.backCompletionHandle = ^{
-//        [selfVc backBtnClick];
-//    };
     [self showDetailViewController:nextVc sender:self];
 }
 
@@ -56,10 +52,11 @@
     
     Test1ViewController *nextVc = [Test1ViewController new];
     nextVc.view.backgroundColor = [UIColor whiteColor];
-    nextVc.xy_navigationBar.contentView.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
+    nextVc.xy_navigationBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
-    nextVc.xy_navigationBar.title = @"自定义的导航条";
-    nextVc.xy_navigationBar.titleColor = [UIColor whiteColor];
+    UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [titleButton setTitle:@"dajhdkajdhakjdhaljdhalkddslakkdklklkajh" forState:UIControlStateNormal];
+    nextVc.xy_navigationBar.titleView = titleButton;
     [self.navigationController pushViewController:nextVc animated:YES];
 }
 

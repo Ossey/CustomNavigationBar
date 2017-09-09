@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface XYNavigationBar : UIView
 
-@property (nonatomic, strong, readonly) UIView *contentView;
+@property (nonatomic, strong) UIView *customView;
 
 @property (nonatomic, strong, readonly) UIView *shadowLineView;
 
@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** 是否隐藏导航条左侧按钮，默认隐藏 */
 @property (nonatomic, assign, getter=isHiddenLeftButton) BOOL hiddenLeftButton;
 
-- (void)setBackBarTitle:(nullable NSString *)title titleColor:(nullable UIColor *)color image:(nullable UIImage *)image forState:(UIControlState)state;
+- (void)setLeftButtonTitle:(nullable NSString *)title image:(nullable UIImage *)image forState:(UIControlState)state;
 
 /**
  * @explain 自定义顶部bar的左侧返回按钮的点击事件，注意: 非特殊情况下，请不要重写这个方法，不然会造成方法内部实现无效；
