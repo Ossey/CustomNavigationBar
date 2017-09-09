@@ -20,16 +20,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self setupCustomBar];
+    self.view.backgroundColor = [UIColor whiteColor];
     
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     
     [super viewWillAppear:animated];
-    
-    // 显示在最顶部，防止子控制器的view添加子控件时盖住了xy_topBar
-    [self.view bringSubviewToFront:self.xy_navigationBar];
     
     // 控制model和push时左侧返回按钮的隐藏和显示
     if (self.presentedViewController) {
@@ -48,19 +45,6 @@
     
     
 }
-
-
-
-- (void)setupCustomBar {
-    
-    self.view.backgroundColor = [UIColor whiteColor];
-    
-    
-}
-
-
-
-
 
 
 // 判断当前控制器是否正在显示
