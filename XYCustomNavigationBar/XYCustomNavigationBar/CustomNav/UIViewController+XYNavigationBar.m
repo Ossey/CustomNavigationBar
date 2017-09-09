@@ -151,7 +151,6 @@
 
 
 @synthesize rightButton = _rightButton;
-@synthesize titleButton = _titleButton;
 @synthesize title = _title;
 @synthesize leftButtonTitle = _leftButtonTitle;
 @synthesize leftButtonImage = _leftButtonImage;
@@ -211,12 +210,6 @@
     
     _title = title;
     [self.titleButton setTitle:title forState:UIControlStateNormal];
-    
-    if (_titleView) {
-        [_titleView removeFromSuperview];
-        _titleView = nil;
-    }
-    
 }
 
 - (NSString *)title {
@@ -231,12 +224,13 @@
 }
 
 - (void)setTitleView:(UIView *)titleView {
+    
     if ([_titleView isEqual:titleView]) {
         return;
     }
-    
+    NSParameterAssert(!titleView.superview);
     _titleView = titleView;
-    if (_title || _titleButton) {
+    if (![_titleButton isEqual:_titleView]) {
         // 为了避免自定义的titleView与titleButton产生冲突
         _title = nil;
         [_titleButton removeFromSuperview];
@@ -256,31 +250,24 @@
         imgView.contentMode = UIViewContentModeCenter;
     }
     
+    if ([titleView isKindOfClass:[UIButton class]]) {
+        UIButton *btn = (UIButton *)titleView;
+        btn.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+        btn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
+    }
+    
 }
 
 - (UIButton *)titleButton {
     if (_titleButton == nil) {
         UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [self.contentView addSubview:titleButton];
-        [titleButton setTitle:self.title forState:UIControlStateNormal];
-        [titleButton setTitleColor:self.titleColor forState:UIControlStateNormal];
         _titleButton = titleButton;
-        titleButton.translatesAutoresizingMaskIntoConstraints = NO;
+        self.titleView = titleButton;
     }
     return _titleButton;
 }
 
 
-- (void)setTitleButton:(UIButton *)titleButton {
-    
-    _titleButton = titleButton;
-    [titleButton removeFromSuperview];
-    if (!titleButton.superview && ![titleButton.superview isEqual:self.contentView]) {
-        [self.contentView addSubview:titleButton];
-        titleButton.userInteractionEnabled = NO;
-        titleButton.translatesAutoresizingMaskIntoConstraints = NO;
-    }
-}
 
 - (UIButton *)rightButton {
     if (_rightButton) {
@@ -381,6 +368,28 @@
     [self.leftButton setImage:image forState:state];
 }
 
+- (void)setShadowLineHeight:(CGFloat)shadowLineHeight {
+    if (_shadowLineHeight == shadowLineHeight) {
+        return;
+    }
+    _shadowLineHeight = shadowLineHeight;
+    if ([self canShowShadowLineView]) {
+        NSInteger foundIndex = [self.shadowLineView.constraints indexOfObjectPassingTest:^BOOL(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            return [obj.identifier isEqualToString:@"shadowLineHeight"];
+        }];
+        
+        if (foundIndex != NSNotFound) {
+            NSLayoutConstraint *constraint = [self.shadowLineView.constraints objectAtIndex:foundIndex];
+            constraint.constant = shadowLineHeight;
+            
+        }
+    }
+    else {
+        [_shadowLineView removeFromSuperview];
+        _shadowLineView = nil;
+    }
+}
+
 
 #pragma mark - Private (auto layout)
 
@@ -390,7 +399,7 @@
     [self.contentView removeConstraints:self.contentView.constraints];
     
     NSDictionary *views = NSDictionaryOfVariableBindings(_contentView, _shadowLineView);
-    NSDictionary *metrics = @{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width), @"leftButtonLeftM": @10, @"leftBtnH": @44, @"rightBtnH": @44, @"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width)};
+    NSDictionary *metrics = @{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width), @"leftButtonLeftM": @10, @"leftBtnH": @44, @"rightBtnH": @44, @"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width), @"shadowLineHeight": @(self.shadowLineHeight)};
     
     NSArray *contentViewConstraints = @[
                                         [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_contentView]|"
@@ -408,7 +417,10 @@
     if ([self canShowShadowLineView]) {
         
         [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_shadowLineView]|" options:kNilOptions metrics:metrics views:views]];
-        [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_shadowLineView(0.5)]|" options:kNilOptions metrics:metrics views:views]];
+        [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_shadowLineView]|" options:kNilOptions metrics:metrics views:views]];
+        NSLayoutConstraint *shadowLineConstrainHeight = [NSLayoutConstraint constraintWithItem:self.shadowLineView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:self.shadowLineHeight];
+        shadowLineConstrainHeight.identifier = @"shadowLineHeight";
+        [self.shadowLineView addConstraint:shadowLineConstrainHeight];
     }
     else {
         [_shadowLineView removeFromSuperview];
@@ -433,17 +445,6 @@
     else {
         [_rightButton removeFromSuperview];
         _rightButton = nil;
-    }
-    
-    if ([self canShowTitleButton]) {
-        NSDictionary *views = NSDictionaryOfVariableBindings(_titleButton);
-        [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.titleButton attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0]];
-        [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.titleButton attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:kNilOptions attribute:kNilOptions multiplier:0.0 constant:150]];
-        [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_titleButton(rightBtnH)]|" options:kNilOptions metrics:metrics views:views]];
-    }
-    else {
-        [_titleButton removeFromSuperview];
-        _titleButton = nil;
     }
     
     if ([self canShowTitleView]) {
@@ -497,6 +498,9 @@
 }
 
 - (BOOL)canShowTitleView {
+    if ([_titleView isEqual:_titleButton]) {
+        return [self canShowTitleButton];
+    }
     if (_titleView.superview) {
         return YES;
     }
@@ -515,12 +519,11 @@
 - (void)setupCustomBar {
     
     self.backgroundColor = [UIColor whiteColor];
-    
     self.shadowLineView.backgroundColor = [UIColor colorWithWhite:160/255.0 alpha:0.7];
-    
     [self.leftButton addTarget:self action:@selector(leftBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-    
     _hiddenLeftButton = NO;
+    self.shadowLineHeight = 0.5;
+    
 }
 
 - (void)leftBtnClick:(UIButton *)btn {

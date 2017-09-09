@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readonly) UIView *shadowLineView;
 
+@property (nonatomic, assign) CGFloat shadowLineHeight;
+
 @property (nonatomic, weak) UIButton *rightButton;
 
 /** 导航条自定义的titleView， 注意: 当设置了titleView，属性title则无效 */

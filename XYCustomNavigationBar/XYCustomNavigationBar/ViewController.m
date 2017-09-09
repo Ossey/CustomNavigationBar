@@ -46,6 +46,7 @@
     [self.xy_navigationBar setLeftButtonTitle:@"back" image:nil forState:UIControlStateNormal];
     nextVc.xy_navigationBar.titleColor = [UIColor whiteColor];
     [self showDetailViewController:nextVc sender:self];
+    nextVc.xy_navigationBar.shadowLineHeight = 2.0;
 }
 
 - (IBAction)pushClick:(id)sender {
@@ -55,7 +56,7 @@
     nextVc.xy_navigationBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
     UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [titleButton setTitle:@"dajhdkajdhakjdhaljdhalkddslakkdklklkajh" forState:UIControlStateNormal];
+    [titleButton setTitle:@"XYNavigationBarController" forState:UIControlStateNormal];
     nextVc.xy_navigationBar.titleView = titleButton;
     [self.navigationController pushViewController:nextVc animated:YES];
 }
