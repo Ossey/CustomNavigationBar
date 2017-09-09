@@ -7,8 +7,6 @@
 //
 
 #import "ViewController.h"
-#import "XYTwoViewController.h"
-#import "XYNextViewController.h"
 
 @interface ViewController (){
 
@@ -59,14 +57,12 @@
 
 - (IBAction)btnClick:(id)sender {
     
-    XYTwoViewController *vc = [XYTwoViewController new];
-    XYCustomNavController *nav = [[XYCustomNavController alloc] initWithRootViewController:vc];
-    [self presentViewController:nav animated:YES completion:nil];
 }
 
 - (void)pushClick {
     
-    XYNextViewController *nextVc = [XYNextViewController new];
+    UIViewController *nextVc = [UIViewController new];
+    nextVc.view.backgroundColor = [UIColor whiteColor];
     [self.navigationController pushViewController:nextVc animated:YES];
 }
 

@@ -1,12 +1,46 @@
 //
-//  XYNavigationBar.m
+//  UIViewController+XYNavigationBar.m
 //  XYCustomNavigationBar
 //
-//  Created by Swae on 09/09/2017.
-//  Copyright © 2017 com.test.demo. All rights reserved.
+//  Created by Swae on 10/09/2017.
+//  Copyright © 2017 Ossey. All rights reserved.
 //
 
-#import "XYNavigationBar.h"
+#import "UIViewController+XYNavigationBar.h"
+#import <objc/runtime.h>
+
+typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
+
+
+#pragma mark *** _WeakObjectContainer ***
+
+@interface _WeakObjectContainer : NSObject
+
+@property (nonatomic, weak, readonly) id weakObject;
+
+- (instancetype)initWithWeakObject:(__weak id)weakObject;
+
+@end
+
+#pragma mark *** _SwizzlingObject ***
+
+@interface _SwizzlingObject : NSObject
+
+@property (nonatomic) Class swizzlingClass;
+@property (nonatomic) SEL orginSelector;
+@property (nonatomic) SEL swizzlingSelector;
+@property (nonatomic) NSValue *swizzlingImplPointer;
+
+@end
+
+@interface NSObject (SwizzlingExtend)
+
+@property (nonatomic, class, readonly) NSMutableDictionary<ImplementationKey, _SwizzlingObject *> *implementationDictionary;
+
+- (Class)xy_baseClassToSwizzling;
+- (void)hockSelector:(SEL)orginSelector swizzlingSelector:(SEL)swizzlingSelector;
+
+@end
 
 @interface XYNavigationBar ()
 
@@ -21,9 +55,115 @@
 
 @end
 
+
+@interface UIViewController ()
+
+@property (nonatomic, assign) BOOL registerHock;
+
+@end
+
+@implementation UIViewController (XYNavigationBar)
+
+- (XYNavigationBar *)xy_navigationBar {
+    
+    NSUInteger foundIndex = [self.view.subviews indexOfObjectPassingTest:^BOOL(__kindof UIView * _Nonnull subview, NSUInteger idx, BOOL * _Nonnull stop) {
+        BOOL res = [subview isKindOfClass:[XYNavigationBar class]];
+        if (res) {
+            *stop = YES;
+        }
+        return res;
+    }];
+    
+    if (foundIndex != NSNotFound) {
+        return self.view.subviews[foundIndex];
+    }
+    
+    XYNavigationBar *xy_navigationBar = [[XYNavigationBar alloc] init];
+    xy_navigationBar.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:xy_navigationBar];
+    NSDictionary *subviewDict = @{@"nacBar": xy_navigationBar};
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[nacBar]|" options:kNilOptions metrics:nil views:subviewDict]];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[nacBar]" options:kNilOptions metrics:nil views:subviewDict]];
+    [self xy_updateViewConstraints];
+    [self registerHock];
+    
+    __weak typeof(self) selfVc = self;
+    self.xy_navigationBar.backCompletionHandle = ^{
+        [selfVc backBtnClick];
+    };
+    
+
+    return xy_navigationBar;
+}
+
+- (BOOL)registerHock {
+    BOOL flag = [objc_getAssociatedObject(self, _cmd) boolValue];
+    if (!flag) {
+        flag = YES;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xy_updateViewConstraints) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
+        
+        objc_setAssociatedObject(self, _cmd, @(flag), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return flag;
+}
+
+
+- (void)xy_updateViewConstraints {
+    CGFloat navigationBarHeight = 0.0;
+    if ([UIDevice currentDevice].orientation == UIInterfaceOrientationPortrait) {
+        navigationBarHeight = 64;
+    }
+    else {
+        navigationBarHeight = 44;
+    }
+    
+    NSInteger foundIndex = [self.view.constraints indexOfObjectPassingTest:^BOOL(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return [obj.identifier isEqualToString:@"topBarConstraintHeight"];
+    }];
+    
+    if (foundIndex != NSNotFound) {
+        NSLayoutConstraint *constraint = [self.view.constraints objectAtIndex:foundIndex];
+        constraint.constant = navigationBarHeight;
+        
+    }
+    else {
+        
+        NSLayoutConstraint *xy_topBarHConst = [NSLayoutConstraint constraintWithItem:self.xy_navigationBar attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:kNilOptions attribute:kNilOptions multiplier:0.0 constant:navigationBarHeight];
+        xy_topBarHConst.identifier = @"topBarConstraintHeight";
+        [self.view addConstraint:xy_topBarHConst];
+    }
+    
+}
+
+- (BOOL)isPresent {
+    
+    BOOL isPresent;
+    
+    NSArray *viewcontrollers = self.navigationController.viewControllers;
+    
+    if (viewcontrollers.count > 1 && [viewcontrollers objectAtIndex:viewcontrollers.count - 1] == self) {
+        isPresent = NO; //push方式
+    }
+    else{
+        isPresent = YES;  // modal方式
+    }
+    
+    return isPresent;
+}
+
+- (void)backBtnClick {
+    if ([self isPresent]) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }else {
+        [[self  navigationController] popViewControllerAnimated:YES];
+    }
+}
+
+@end
+
 @implementation XYNavigationBar
 
-static id obj;
 
 @synthesize xy_rightButton = _xy_rightButton;
 @synthesize xy_titleButton = _xy_titleButton;
@@ -268,7 +408,7 @@ static id obj;
 #pragma mark - Private (auto layout)
 - (void)updateConstraints {
     [super updateConstraints];
- 
+    
     NSDictionary *views = NSDictionaryOfVariableBindings(_xy_topBar, _shadowLineView);
     NSDictionary *metrics = @{@"leftButtonMaxW": @150, @"leftButtonLeftM": @10, @"leftBtnH": @44, @"rightBtnH": @44, @"rightBtnRightM": @10};
     
@@ -336,7 +476,8 @@ static id obj;
     if (responder) {
         UIViewController *vc = (UIViewController *)responder;
         if (vc.navigationController && !vc.navigationController.isNavigationBarHidden) {
-            vc.navigationController.navigationBar.userInteractionEnabled = NO;
+            //            vc.navigationController.navigationBar.userInteractionEnabled = NO;
+            [vc.navigationController setNavigationBarHidden:YES];
         }
     }
 }
@@ -346,6 +487,133 @@ static id obj;
     UIView *touchView = [super hitTest:point withEvent:event];
     
     return touchView;
+}
+
+@end
+
+
+@implementation _WeakObjectContainer
+
+- (instancetype)initWithWeakObject:(__weak id)weakObject {
+    if (self = [super init]) {
+        _weakObject = weakObject;
+    }
+    return self;
+}
+
+@end
+
+@implementation _SwizzlingObject
+
+- (NSString *)description {
+    
+    NSDictionary *descriptionDict = @{@"swizzlingClass": self.swizzlingClass,
+                                      @"orginSelector": NSStringFromSelector(self.orginSelector),
+                                      @"swizzlingImplPointer": self.swizzlingImplPointer};
+    
+    return [descriptionDict description];
+}
+
+@end
+
+@implementation NSObject (SwizzlingExtend)
+
+////////////////////////////////////////////////////////////////////////
+#pragma mark - Method swizzling
+////////////////////////////////////////////////////////////////////////
+
+
+- (void)hockSelector:(SEL)orginSelector swizzlingSelector:(SEL)swizzlingSelector {
+    
+    // 本类未实现则return
+    if (![self respondsToSelector:orginSelector]) {
+        return;
+    }
+    
+    NSLog(@"%@", self.implementationDictionary);
+    
+    for (_SwizzlingObject *implObject in self.implementationDictionary.allValues) {
+        // 确保setImplementation 在UITableView or UICollectionView只调用一次, 也就是每个方法的指针只存储一次
+        if (orginSelector == implObject.orginSelector && [self isKindOfClass:implObject.swizzlingClass]) {
+            return;
+        }
+    }
+    
+    Class baseClas = [self xy_baseClassToSwizzling];
+    ImplementationKey key = xy_getImplementationKey(baseClas, orginSelector);
+    _SwizzlingObject *swizzleObjcet = [self.implementationDictionary objectForKey:key];
+    NSValue *implValue = swizzleObjcet.swizzlingImplPointer;
+    
+    // 如果该类的实现已经存在，就return
+    if (implValue || !key || !baseClas) {
+        return;
+    }
+    
+    // 注入额外的实现
+    Method method = class_getInstanceMethod(baseClas, orginSelector);
+    // 设置这个方法的实现
+    IMP newImpl = method_setImplementation(method, (IMP)xy_orginalImplementation);
+    
+    // 将新实现保存到implementationDictionary中
+    swizzleObjcet = [_SwizzlingObject new];
+    swizzleObjcet.swizzlingClass = baseClas;
+    swizzleObjcet.orginSelector = orginSelector;
+    swizzleObjcet.swizzlingImplPointer = [NSValue valueWithPointer:newImpl];
+    swizzleObjcet.swizzlingSelector = swizzlingSelector;
+    [self.implementationDictionary setObject:swizzleObjcet forKey:key];
+}
+
+/// 根据类名和方法，拼接字符串，作为implementationDictionary的key
+NSString * xy_getImplementationKey(Class clas, SEL selector) {
+    if (clas == nil || selector == nil) {
+        return nil;
+    }
+    
+    NSString *className = NSStringFromClass(clas);
+    NSString *selectorName = NSStringFromSelector(selector);
+    return [NSString stringWithFormat:@"%@_%@", className, selectorName];
+}
+
+// 对原方法的实现进行加工
+void xy_orginalImplementation(id self, SEL _cmd) {
+    
+    Class baseCls = [self xy_baseClassToSwizzling];
+    ImplementationKey key = xy_getImplementationKey(baseCls, _cmd);
+    _SwizzlingObject *swizzleObject = [[self implementationDictionary] objectForKey:key];
+    NSValue *implValue = swizzleObject.swizzlingImplPointer;
+    
+    // 获取原方法的实现
+    IMP impPointer = [implValue pointerValue];
+    
+    // 执行原实现
+    if (impPointer) {
+        ((void(*)(id, SEL))impPointer)(self, _cmd);
+    }
+    
+    // 执行swizzing
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    SEL swizzlingSelector = swizzleObject.swizzlingSelector;
+    if ([self respondsToSelector:swizzlingSelector]) {
+        [self performSelector:swizzlingSelector];
+    }
+#pragma clang diagnostic pop
+}
++ (NSMutableDictionary *)implementationDictionary {
+    static NSMutableDictionary *table = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        table = [NSMutableDictionary dictionary];
+    });
+    return table;
+}
+
+- (NSMutableDictionary<ImplementationKey, _SwizzlingObject *> *)implementationDictionary {
+    return self.class.implementationDictionary;
+}
+
+- (Class)xy_baseClassToSwizzling {
+    return [self class];
 }
 
 @end

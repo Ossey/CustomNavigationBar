@@ -1,12 +1,13 @@
 //
-//  XYNavigationBar.h
+//  UIViewController+XYNavigationBar.h
 //  XYCustomNavigationBar
 //
-//  Created by Swae on 09/09/2017.
-//  Copyright © 2017 com.test.demo. All rights reserved.
+//  Created by Swae on 10/09/2017.
+//  Copyright © 2017 Ossey. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
+
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -45,5 +46,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+
+
+@interface UIViewController (XYNavigationBar)
+
+@property (nonatomic, readonly) XYNavigationBar *xy_navigationBar;
+
+- (void)backBtnClick;
+
+@end
 
 NS_ASSUME_NONNULL_END
