@@ -69,7 +69,7 @@
     [self registerNotification];
     
     __weak typeof(self) selfVc = self;
-    self.xy_navigationBar.backCompletionHandle = ^{
+    self.xy_navigationBar.leftButtonClick = ^{
         [selfVc backBtnClick];
     };
     
@@ -532,8 +532,8 @@
 }
 
 - (void)leftBtnClick:(UIButton *)btn {
-    if (self.backCompletionHandle) {
-        self.backCompletionHandle();
+    if (self.leftButtonClick) {
+        self.leftButtonClick();
     }
     
 }
