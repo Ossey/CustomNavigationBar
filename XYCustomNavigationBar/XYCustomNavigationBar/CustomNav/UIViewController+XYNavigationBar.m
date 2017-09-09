@@ -128,9 +128,9 @@
     NSArray *viewcontrollers = self.navigationController.viewControllers;
     
     if (viewcontrollers.count > 1 && [viewcontrollers objectAtIndex:viewcontrollers.count - 1] == self) {
-        isPresent = NO; //push方式
+        isPresent = NO; // push方式
     }
-    else{
+    else {
         isPresent = YES;  // modal方式
     }
     
@@ -140,7 +140,8 @@
 - (void)backBtnClick {
     if ([self isPresent]) {
         [self dismissViewControllerAnimated:YES completion:nil];
-    }else {
+    }
+    else {
         [[self  navigationController] popViewControllerAnimated:YES];
     }
 }
@@ -279,7 +280,9 @@
 }
 
 - (void)setRightButton:(UIButton *)rightButton {
-    
+    if (_rightButton == rightButton) {
+        return;
+    }
     _rightButton = rightButton;
     [rightButton removeFromSuperview];
     if (!rightButton.superview && ![rightButton.superview isEqual:self.contentView]) {
@@ -295,9 +298,11 @@
     return _backBarState ?: UIControlStateNormal;
 }
 
-- (void)setLeftButtonImage:(UIImage *)_leftButtonImage {
-    
-    _leftButtonImage = _leftButtonImage;
+- (void)setLeftButtonImage:(UIImage *)leftButtonImage {
+    if (_leftButtonImage == leftButtonImage) {
+        return;
+    }
+    _leftButtonImage = leftButtonImage;
     [self.leftButton setImage:_leftButtonImage forState:self.backBarState];
 }
 
@@ -544,8 +549,6 @@
     if (responder) {
         UIViewController *vc = (UIViewController *)responder;
         if (vc.navigationController && !vc.navigationController.isNavigationBarHidden) {
-//                        vc.navigationController.navigationBar.userInteractionEnabled = NO;
-//            [vc.navigationController setNavigationBarHidden:YES]; 
             vc.navigationController.navigationBar.hidden = YES;
         }
     }
