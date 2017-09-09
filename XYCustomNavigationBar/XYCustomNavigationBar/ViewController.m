@@ -18,15 +18,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.xy_navigationBar.xy_topBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
+    self.xy_navigationBar.contentView.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
-    self.xy_navigationBar.xy_title = @"自定义的导航条";
-    self.xy_navigationBar.xy_titleColor = [UIColor whiteColor];
+    self.xy_navigationBar.title = @"自定义的导航条";
+    self.xy_navigationBar.titleColor = [UIColor whiteColor];
     
     // 设置右侧按钮
-    self.xy_navigationBar.xy_rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.xy_navigationBar.xy_rightButton setTitle:@"右侧" forState:UIControlStateNormal];
-    [self.xy_navigationBar.xy_rightButton addTarget:self action:@selector(rightButtonClick) forControlEvents:UIControlEventTouchDown];
+    self.xy_navigationBar.rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.xy_navigationBar.rightButton setTitle:@"右侧" forState:UIControlStateNormal];
+    [self.xy_navigationBar.rightButton addTarget:self action:@selector(rightButtonClick) forControlEvents:UIControlEventTouchDown];
 
 }
 
@@ -40,15 +40,15 @@
 - (IBAction)modalBtnClick:(id)sender {
     Test1ViewController *nextVc = [Test1ViewController new];
     nextVc.view.backgroundColor = [UIColor whiteColor];
-    nextVc.xy_navigationBar.xy_topBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
+    nextVc.xy_navigationBar.contentView.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
-    nextVc.xy_navigationBar.xy_title = @"自定义的导航条";
-    [self.xy_navigationBar xy_setBackBarTitle:@"back" titleColor:[UIColor blueColor] image:nil forState:UIControlStateNormal];
-    nextVc.xy_navigationBar.xy_titleColor = [UIColor whiteColor];
+    nextVc.xy_navigationBar.title = @"自定义的导航条";
+    [self.xy_navigationBar setBackBarTitle:@"back" titleColor:[UIColor blueColor] image:nil forState:UIControlStateNormal];
+    nextVc.xy_navigationBar.titleColor = [UIColor whiteColor];
     __weak typeof(nextVc) selfVc = nextVc;
-    nextVc.xy_navigationBar.backCompletionHandle = ^{
-        [selfVc backBtnClick];
-    };
+//    nextVc.xy_navigationBar.backCompletionHandle = ^{
+//        [selfVc backBtnClick];
+//    };
     [self showDetailViewController:nextVc sender:self];
 }
 
@@ -56,10 +56,10 @@
     
     Test1ViewController *nextVc = [Test1ViewController new];
     nextVc.view.backgroundColor = [UIColor whiteColor];
-    nextVc.xy_navigationBar.xy_topBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
+    nextVc.xy_navigationBar.contentView.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
-    nextVc.xy_navigationBar.xy_title = @"自定义的导航条";
-    nextVc.xy_navigationBar.xy_titleColor = [UIColor whiteColor];
+    nextVc.xy_navigationBar.title = @"自定义的导航条";
+    nextVc.xy_navigationBar.titleColor = [UIColor whiteColor];
     [self.navigationController pushViewController:nextVc animated:YES];
 }
 
