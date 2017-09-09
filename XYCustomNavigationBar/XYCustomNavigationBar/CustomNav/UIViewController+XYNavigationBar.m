@@ -9,42 +9,10 @@
 #import "UIViewController+XYNavigationBar.h"
 #import <objc/runtime.h>
 
-typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
-
-
-#pragma mark *** _WeakObjectContainer ***
-
-@interface _WeakObjectContainer : NSObject
-
-@property (nonatomic, weak, readonly) id weakObject;
-
-- (instancetype)initWithWeakObject:(__weak id)weakObject;
-
-@end
-
-#pragma mark *** _SwizzlingObject ***
-
-@interface _SwizzlingObject : NSObject
-
-@property (nonatomic) Class swizzlingClass;
-@property (nonatomic) SEL orginSelector;
-@property (nonatomic) SEL swizzlingSelector;
-@property (nonatomic) NSValue *swizzlingImplPointer;
-
-@end
-
-@interface NSObject (SwizzlingExtend)
-
-@property (nonatomic, class, readonly) NSMutableDictionary<ImplementationKey, _SwizzlingObject *> *implementationDictionary;
-
-- (Class)xy_baseClassToSwizzling;
-- (void)hockSelector:(SEL)orginSelector swizzlingSelector:(SEL)swizzlingSelector;
-
-@end
 
 @interface XYNavigationBar ()
 
-@property (nonatomic, strong) UIView *xy_topBar;     // 导航条xy_topBar
+@property (nonatomic, strong) UIView *xy_topBar;             // 导航条xy_topBar
 @property (nonatomic, strong) UIView *shadowLineView;        // 导航条阴影线
 @property (nonatomic, strong) UIImage *xy_backBarImage;      // 导航条左侧返回按钮的图片
 @property (nonatomic, assign) UIControlState xy_backBarState; // 导航条左侧返回按钮的状态
@@ -63,6 +31,16 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
 @end
 
 @implementation UIViewController (XYNavigationBar)
+
++ (void)load {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        method_exchangeImplementations(class_getInstanceMethod(self.class, NSSelectorFromString(@"dealloc")),
+                                       class_getInstanceMethod(self.class, @selector(xy_dealloc)));
+    });
+    
+    
+}
 
 - (XYNavigationBar *)xy_navigationBar {
     
@@ -106,6 +84,10 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
         objc_setAssociatedObject(self, _cmd, @(flag), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     return flag;
+}
+
+- (void)xy_dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
 }
 
 
@@ -240,10 +222,6 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
     
 }
 
-- (BOOL)isHiddenLeftButton {
-    
-    return _hiddenLeftButton ?: NO;
-}
 
 - (void)setHiddenLeftButton:(BOOL)hiddenLeftButton {
     _hiddenLeftButton = hiddenLeftButton;
@@ -405,27 +383,6 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
     [self.leftButton setTitleColor:color forState:state];
 }
 
-- (BOOL)canShowLeftButton {
-    if ([_leftButton titleForState:UIControlStateNormal] || [_leftButton attributedTitleForState:UIControlStateNormal].string.length > 0 || [_leftButton imageForState:UIControlStateNormal]) {
-        return _leftButton.superview != nil;
-    }
-    return NO;
-}
-
-- (BOOL)canShowTitleButton {
-    if ([_xy_titleButton titleForState:UIControlStateNormal] || [_xy_titleButton attributedTitleForState:UIControlStateNormal].string.length > 0 || [_xy_titleButton imageForState:UIControlStateNormal]) {
-        return _xy_titleButton.superview != nil;
-    }
-    return NO;
-}
-
-- (BOOL)canShowTitleView {
-    if (_xy_titleView.superview) {
-        return YES;
-    }
-    return NO;
-}
-
 
 #pragma mark - Private (auto layout)
 - (void)updateConstraints {
@@ -440,13 +397,13 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
     [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_shadowLineView]|" options:kNilOptions metrics:metrics views:views]];
     [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_shadowLineView(0.5)]|" options:kNilOptions metrics:metrics views:views]];
     
-    if ([self canShowTitleButton]) {
+    if ([self canShowLeftButton]) {
         NSDictionary *views = NSDictionaryOfVariableBindings(_leftButton);
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-leftButtonLeftM-[_leftButton(<=leftButtonMaxW)]" options:kNilOptions metrics:metrics views:views]];
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_leftButton(leftBtnH)]|" options:kNilOptions metrics:metrics views:views]];
     }
     
-    if ([self canShowLeftButton]) {
+    if ([self canshowRightButton]) {
         NSDictionary *views = NSDictionaryOfVariableBindings(_xy_rightButton);
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[_xy_rightButton(<=leftButtonMaxW)]-rightBtnRightM-|" options:kNilOptions metrics:metrics views:views]];
         [self.xy_topBar addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_xy_rightButton(rightBtnH)]|" options:kNilOptions metrics:metrics views:views]];
@@ -456,7 +413,7 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
         _leftButton = nil;
     }
     
-    if (self.xy_titleButton && self.xy_titleButton.superview) {
+    if ([self canShowTitleButton]) {
         NSDictionary *views = NSDictionaryOfVariableBindings(_xy_titleButton);
         [self.xy_topBar addConstraint:[NSLayoutConstraint constraintWithItem:self.xy_titleButton attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.xy_topBar attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0]];
         [self.xy_topBar addConstraint:[NSLayoutConstraint constraintWithItem:self.xy_titleButton attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:kNilOptions attribute:kNilOptions multiplier:0.0 constant:150]];
@@ -479,6 +436,39 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
         _xy_titleView = nil;
     }
 }
+- (BOOL)canShowLeftButton {
+    if ([_leftButton titleForState:UIControlStateNormal] ||
+        [_leftButton attributedTitleForState:UIControlStateNormal].string.length > 0 ||
+        [_leftButton imageForState:UIControlStateNormal]) {
+        return _leftButton.superview != nil;
+    }
+    return NO;
+}
+
+- (BOOL)canShowTitleButton {
+    if ([_xy_titleButton titleForState:UIControlStateNormal] ||
+        [_xy_titleButton attributedTitleForState:UIControlStateNormal].string.length > 0 ||
+        [_xy_titleButton imageForState:UIControlStateNormal]) {
+        return _xy_titleButton.superview != nil;
+    }
+    return NO;
+}
+
+- (BOOL)canShowTitleView {
+    if (_xy_titleView.superview) {
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)canshowRightButton {
+    if ([_xy_rightButton titleForState:UIControlStateNormal] ||
+        [_xy_rightButton attributedTitleForState:UIControlStateNormal].string.length > 0 ||
+        [_xy_rightButton imageForState:UIControlStateNormal]) {
+        return _xy_rightButton.superview != nil;
+    }
+    return NO;
+}
 
 - (void)setupCustomBar {
     
@@ -489,7 +479,7 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
     
     [self.leftButton addTarget:self action:@selector(leftBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     
-    
+    _hiddenLeftButton = NO;
 }
 
 - (void)leftBtnClick:(UIButton *)btn {
@@ -510,8 +500,9 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
     if (responder) {
         UIViewController *vc = (UIViewController *)responder;
         if (vc.navigationController && !vc.navigationController.isNavigationBarHidden) {
-            //            vc.navigationController.navigationBar.userInteractionEnabled = NO;
-            [vc.navigationController setNavigationBarHidden:YES];
+//                        vc.navigationController.navigationBar.userInteractionEnabled = NO;
+//            [vc.navigationController setNavigationBarHidden:YES]; 
+            vc.navigationController.navigationBar.hidden = YES;
         }
     }
 }
@@ -526,128 +517,3 @@ typedef NSString * ImplementationKey NS_EXTENSIBLE_STRING_ENUM;
 @end
 
 
-@implementation _WeakObjectContainer
-
-- (instancetype)initWithWeakObject:(__weak id)weakObject {
-    if (self = [super init]) {
-        _weakObject = weakObject;
-    }
-    return self;
-}
-
-@end
-
-@implementation _SwizzlingObject
-
-- (NSString *)description {
-    
-    NSDictionary *descriptionDict = @{@"swizzlingClass": self.swizzlingClass,
-                                      @"orginSelector": NSStringFromSelector(self.orginSelector),
-                                      @"swizzlingImplPointer": self.swizzlingImplPointer};
-    
-    return [descriptionDict description];
-}
-
-@end
-
-@implementation NSObject (SwizzlingExtend)
-
-////////////////////////////////////////////////////////////////////////
-#pragma mark - Method swizzling
-////////////////////////////////////////////////////////////////////////
-
-
-- (void)hockSelector:(SEL)orginSelector swizzlingSelector:(SEL)swizzlingSelector {
-    
-    // 本类未实现则return
-    if (![self respondsToSelector:orginSelector]) {
-        return;
-    }
-    
-    NSLog(@"%@", self.implementationDictionary);
-    
-    for (_SwizzlingObject *implObject in self.implementationDictionary.allValues) {
-        // 确保setImplementation 在UITableView or UICollectionView只调用一次, 也就是每个方法的指针只存储一次
-        if (orginSelector == implObject.orginSelector && [self isKindOfClass:implObject.swizzlingClass]) {
-            return;
-        }
-    }
-    
-    Class baseClas = [self xy_baseClassToSwizzling];
-    ImplementationKey key = xy_getImplementationKey(baseClas, orginSelector);
-    _SwizzlingObject *swizzleObjcet = [self.implementationDictionary objectForKey:key];
-    NSValue *implValue = swizzleObjcet.swizzlingImplPointer;
-    
-    // 如果该类的实现已经存在，就return
-    if (implValue || !key || !baseClas) {
-        return;
-    }
-    
-    // 注入额外的实现
-    Method method = class_getInstanceMethod(baseClas, orginSelector);
-    // 设置这个方法的实现
-    IMP newImpl = method_setImplementation(method, (IMP)xy_orginalImplementation);
-    
-    // 将新实现保存到implementationDictionary中
-    swizzleObjcet = [_SwizzlingObject new];
-    swizzleObjcet.swizzlingClass = baseClas;
-    swizzleObjcet.orginSelector = orginSelector;
-    swizzleObjcet.swizzlingImplPointer = [NSValue valueWithPointer:newImpl];
-    swizzleObjcet.swizzlingSelector = swizzlingSelector;
-    [self.implementationDictionary setObject:swizzleObjcet forKey:key];
-}
-
-/// 根据类名和方法，拼接字符串，作为implementationDictionary的key
-NSString * xy_getImplementationKey(Class clas, SEL selector) {
-    if (clas == nil || selector == nil) {
-        return nil;
-    }
-    
-    NSString *className = NSStringFromClass(clas);
-    NSString *selectorName = NSStringFromSelector(selector);
-    return [NSString stringWithFormat:@"%@_%@", className, selectorName];
-}
-
-// 对原方法的实现进行加工
-void xy_orginalImplementation(id self, SEL _cmd) {
-    
-    Class baseCls = [self xy_baseClassToSwizzling];
-    ImplementationKey key = xy_getImplementationKey(baseCls, _cmd);
-    _SwizzlingObject *swizzleObject = [[self implementationDictionary] objectForKey:key];
-    NSValue *implValue = swizzleObject.swizzlingImplPointer;
-    
-    // 获取原方法的实现
-    IMP impPointer = [implValue pointerValue];
-    
-    // 执行原实现
-    if (impPointer) {
-        ((void(*)(id, SEL))impPointer)(self, _cmd);
-    }
-    
-    // 执行swizzing
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-    SEL swizzlingSelector = swizzleObject.swizzlingSelector;
-    if ([self respondsToSelector:swizzlingSelector]) {
-        [self performSelector:swizzlingSelector];
-    }
-#pragma clang diagnostic pop
-}
-+ (NSMutableDictionary *)implementationDictionary {
-    static NSMutableDictionary *table = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        table = [NSMutableDictionary dictionary];
-    });
-    return table;
-}
-
-- (NSMutableDictionary<ImplementationKey, _SwizzlingObject *> *)implementationDictionary {
-    return self.class.implementationDictionary;
-}
-
-- (Class)xy_baseClassToSwizzling {
-    return [self class];
-}
-
-@end

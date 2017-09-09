@@ -7,11 +7,9 @@
 //
 
 #import "ViewController.h"
+#import "Test1ViewController.h"
 
-@interface ViewController (){
-
-    UIImageView *_imageView;
-}
+@interface ViewController ()
 
 @end
 
@@ -30,17 +28,15 @@
     [self.xy_navigationBar.xy_rightButton setTitle:@"右侧" forState:UIControlStateNormal];
     [self.xy_navigationBar.xy_rightButton addTarget:self action:@selector(rightButtonClick) forControlEvents:UIControlEventTouchDown];
     
-    _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(self.xy_navigationBar.xy_topBar.frame), CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame))];
-    _imageView.image = [UIImage imageNamed:@"1"];
-    [self.view addSubview:_imageView];
-    
     UIButton *modalBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [modalBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [self.view addSubview:modalBtn];
     [modalBtn setTitle:@"modal" forState:UIControlStateNormal];
     modalBtn.frame = CGRectMake(100, 300, 300, 44);
     [modalBtn addTarget:self action:@selector(btnClick:) forControlEvents:UIControlEventTouchDown];
     
     UIButton *pushBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [pushBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [self.view addSubview:pushBtn];
     [pushBtn setTitle:@"push" forState:UIControlStateNormal];
     pushBtn.frame = CGRectMake(100, 400, 300, 44);
@@ -56,13 +52,23 @@
 }
 
 - (IBAction)btnClick:(id)sender {
+    Test1ViewController *nextVc = [Test1ViewController new];
+    nextVc.view.backgroundColor = [UIColor whiteColor];
+    nextVc.xy_navigationBar.xy_topBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
+    nextVc.xy_navigationBar.xy_title = @"自定义的导航条";
+    nextVc.xy_navigationBar.xy_titleColor = [UIColor whiteColor];
+    [self showDetailViewController:nextVc sender:self];
 }
 
 - (void)pushClick {
     
-    UIViewController *nextVc = [UIViewController new];
+    Test1ViewController *nextVc = [Test1ViewController new];
     nextVc.view.backgroundColor = [UIColor whiteColor];
+    nextVc.xy_navigationBar.xy_topBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
+    
+    nextVc.xy_navigationBar.xy_title = @"自定义的导航条";
+    nextVc.xy_navigationBar.xy_titleColor = [UIColor whiteColor];
     [self.navigationController pushViewController:nextVc animated:YES];
 }
 
