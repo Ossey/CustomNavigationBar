@@ -83,7 +83,7 @@
     [superView addSubview:navigationBar];
     NSDictionary *subviewDict = @{@"nacBar": navigationBar};
     NSArray *contentViewConstraints = @[
-                                        [NSLayoutConstraint constraintsWithVisualFormat:@"V:[nacBar(>=0)]"
+                                        [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[nacBar(>=0)]"
                                                                                 options:0
                                                                                 metrics:nil
                                                                                   views:subviewDict],
@@ -177,7 +177,7 @@
     }
     else {
         
-        NSLayoutConstraint *contentViewHConst = [NSLayoutConstraint constraintWithItem:self.xy_navigationBar attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:kNilOptions attribute:kNilOptions multiplier:0.0 constant:navigationBarHeight];
+        NSLayoutConstraint *contentViewHConst = [NSLayoutConstraint constraintWithItem:self.xy_navigationBar attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:kNilOptions multiplier:1.0 constant:navigationBarHeight];
         contentViewHConst.identifier = @"topBarConstraintHeight";
         [self.xy_navigationBar addConstraint:contentViewHConst];
     }

@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setLeftButtonTitle:(nullable NSString *)title image:(nullable UIImage *)image forState:(UIControlState)state;
 
-@property (nonatomic, copy) void (^leftButtonClick)();
+@property (nonatomic, copy) void (^leftButtonClick)(void);
 
 @end
 
