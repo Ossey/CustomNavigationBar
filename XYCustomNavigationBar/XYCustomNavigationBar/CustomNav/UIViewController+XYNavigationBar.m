@@ -41,27 +41,37 @@
         
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        Class class = [self class];
-        
-        SEL originSelector = NSSelectorFromString(@"dealloc");
-        SEL swizzledSelector = @selector(xy_dealloc);
-        Method originMethod = class_getInstanceMethod(class, originSelector);
-        Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
-        
-        BOOL didAddMethod = class_addMethod(class,
-                                            originSelector,
-                                            method_getImplementation(swizzledMethod),
-                                            method_getTypeEncoding(swizzledMethod));
-        if (didAddMethod) {
-            class_replaceMethod(class,
-                                swizzledSelector,
-                                method_getImplementation(originMethod),
-                                method_getTypeEncoding(originMethod));
-        } else {
-            method_exchangeImplementations(originMethod, swizzledMethod);
-        }
+        [self exchangeImplementationWithSelector:NSSelectorFromString(@"dealloc") swizzledSelector:@selector(xy_dealloc)];
+        [self exchangeImplementationWithSelector:@selector(viewWillAppear:) swizzledSelector:@selector(xy_viewWillAppear:)];
     });
     
+    
+}
+
+- (void)xy_viewWillAppear:(BOOL)animated {
+    [self xy_viewWillAppear:animated];
+    XYNavigationBar *navigationBar = objc_getAssociatedObject(self, @selector(xy_navigationBar));
+    if (!navigationBar) {
+        return;
+    }
+    // 控制model和push时左侧返回按钮默认的隐藏和显示
+    if (self.presentedViewController) {
+        if ([self.presentedViewController isKindOfClass:[UIViewController class]] && self.presentedViewController.navigationController.childViewControllers.count <= 1) {
+            navigationBar.hiddenLeftButton = YES;
+        } else if ([self.presentedViewController isKindOfClass:[UINavigationController class]] && self.childViewControllers.count <= 1) {
+            navigationBar.hiddenLeftButton = YES;
+        }
+    }
+    else if (self.presentingViewController) {
+        navigationBar.hiddenLeftButton = NO;
+    }
+    else if (!self.presentedViewController &&
+             self.navigationController.childViewControllers.count <= 1) {
+        navigationBar.hiddenLeftButton = YES;
+    }
+    else {
+        navigationBar.hiddenLeftButton = NO;
+    }
     
 }
 
@@ -207,6 +217,27 @@
         [[self  navigationController] popViewControllerAnimated:YES];
     }
 }
+
+#pragma mark - Swizzling
++ (void)exchangeImplementationWithSelector:(SEL)originSelector swizzledSelector:(SEL)swizzledSelector {
+    Class class = [self class];
+    Method originMethod = class_getInstanceMethod(class, originSelector);
+    Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
+    
+    BOOL didAddMethod = class_addMethod(class,
+                                        originSelector,
+                                        method_getImplementation(swizzledMethod),
+                                        method_getTypeEncoding(swizzledMethod));
+    if (didAddMethod) {
+        class_replaceMethod(class,
+                            swizzledSelector,
+                            method_getImplementation(originMethod),
+                            method_getTypeEncoding(originMethod));
+    } else {
+        method_exchangeImplementations(originMethod, swizzledMethod);
+    }
+}
+
 
 @end
 
@@ -466,7 +497,6 @@
 
 - (void)updateConstraints {
     [super updateConstraints];
-//    [self removeConstraints:self.constraints];
     for (NSLayoutConstraint *constr in self.constraints.copy ) {
         if (![constr.firstItem isEqual:self]) {
             [self removeConstraint:constr];
@@ -475,7 +505,7 @@
     [self.contentView removeConstraints:self.contentView.constraints];
     
     NSDictionary *views = NSDictionaryOfVariableBindings(_contentView, _shadowLineView);
-    NSDictionary *metrics = @{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width), @"leftButtonLeftM": @10, @"leftBtnH": @44, @"rightBtnH": @44, @"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width), @"shadowLineHeight": @(self.shadowLineHeight)};
+    NSDictionary *metrics = @{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width+10), @"leftButtonLeftM": @10, @"leftBtnH": @44, @"rightBtnH": @44, @"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width+10), @"shadowLineHeight": @(self.shadowLineHeight)};
     
     NSArray *contentViewConstraints = @[
                                         [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_contentView]|"

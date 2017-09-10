@@ -28,26 +28,6 @@
     
     [super viewWillAppear:animated];
     
-    // 控制model和push时左侧返回按钮的隐藏和显示
-    if (self.presentedViewController) {
-        if ([self.presentedViewController isKindOfClass:[UIViewController class]] && self.presentedViewController.navigationController.childViewControllers.count <= 1) {
-            self.xy_navigationBar.hiddenLeftButton = YES;
-        } else if ([self.presentedViewController isKindOfClass:[UINavigationController class]] && self.childViewControllers.count <= 1) {
-            self.xy_navigationBar.hiddenLeftButton = YES;
-        }
-    }
-    else if (self.presentingViewController) {
-        self.xy_navigationBar.hiddenLeftButton = NO;
-    }
-    else if (!self.presentedViewController &&
-             self.navigationController.childViewControllers.count <= 1) {
-        self.xy_navigationBar.hiddenLeftButton = YES;
-    }
-    else {
-        self.xy_navigationBar.hiddenLeftButton = NO;
-    }
-    
-    
 }
 
 
