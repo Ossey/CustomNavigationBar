@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "Test1ViewController.h"
 
-@interface ViewController ()
+@interface ViewController () 
 
 @end
 
@@ -71,6 +71,18 @@
 - (UIStatusBarStyle)preferredStatusBarStyle {
 
     return UIStatusBarStyleLightContent;
+}
+
+- (void)willMoveToParentViewController:(UIViewController*)parent{
+    [super willMoveToParentViewController:parent];
+    NSLog(@"%s,%@",__FUNCTION__,parent);
+}
+- (void)didMoveToParentViewController:(UIViewController*)parent{
+    [super didMoveToParentViewController:parent];
+    NSLog(@"%s,%@",__FUNCTION__,parent);
+    if(!parent){
+        NSLog(@"页面pop成功了");
+    }
 }
 
 

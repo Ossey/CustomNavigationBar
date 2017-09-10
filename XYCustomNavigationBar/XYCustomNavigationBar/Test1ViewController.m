@@ -8,7 +8,7 @@
 
 #import "Test1ViewController.h"
 
-@interface Test1ViewController ()
+@interface Test1ViewController () <UIGestureRecognizerDelegate>
 
 @end
 
@@ -47,6 +47,33 @@
 
 - (void)dealloc {
     NSLog(@"%s", __FUNCTION__);
+}
+
+- (void)willMoveToParentViewController:(UIViewController*)parent{
+    [super willMoveToParentViewController:parent];
+    NSLog(@"%s,%@",__FUNCTION__,parent);
+}
+- (void)didMoveToParentViewController:(UIViewController*)parent{
+    [super didMoveToParentViewController:parent];
+    NSLog(@"%s,%@",__FUNCTION__,parent);
+    if(!parent){
+        NSLog(@"页面pop成功了");
+    }
+}
+
+- (void)transitionFromViewController:(UIViewController *)fromViewController toViewController:(UIViewController *)toViewController duration:(NSTimeInterval)duration options:(UIViewAnimationOptions)options animations:(void (^ __nullable)(void))animations completion:(void (^ __nullable)(BOOL finished))completion {
+    
+    
+}
+
+- (void)beginAppearanceTransition:(BOOL)isAppearing animated:(BOOL)animated {
+    
+    
+}
+- (void)endAppearanceTransition {
+    
+    
+
 }
 
 

@@ -11,13 +11,20 @@
 
 @interface XYNavigationBar ()
 
-@property (nonatomic, strong) UIView *contentView;             // 导航条contentView
-@property (nonatomic, strong) UIView *shadowLineView;        // 导航条阴影线
-@property (nonatomic, strong) UIImage *leftButtonImage;      // 导航条左侧返回按钮的图片
-@property (nonatomic, assign) UIControlState backBarState; // 导航条左侧返回按钮的状态
-@property (nonatomic, weak) UIButton *leftButton;            // 导航条左侧按钮
-@property (nonatomic, weak) UIButton *titleButton;          // 导航条titleView
-@property (nonatomic, copy) NSString *leftButtonTitle;       // 导航条左侧返回按钮的文字，这个属性在当前控制器下有效
+/** 导航条contentView */
+@property (nonatomic, strong) UIView *contentView;
+/** 导航条阴影线 */
+@property (nonatomic, strong) UIView *shadowLineView;
+/** 导航条左侧返回按钮的图片 */
+@property (nonatomic, strong) UIImage *leftButtonImage;
+/** 导航条左侧返回按钮的状态 */
+@property (nonatomic, assign) UIControlState backBarState;
+/** 导航条左侧按钮 */
+@property (nonatomic, weak) UIButton *leftButton;
+/** 导航条titleView */
+@property (nonatomic, weak) UIButton *titleButton;
+/** 导航条左侧返回按钮的文字，这个属性在当前控制器下有效 */
+@property (nonatomic, copy) NSString *leftButtonTitle;
 
 
 @end
@@ -31,10 +38,28 @@
 @implementation UIViewController (XYNavigationBar)
 
 + (void)load {
+        
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        method_exchangeImplementations(class_getInstanceMethod(self.class, NSSelectorFromString(@"dealloc")),
-                                       class_getInstanceMethod(self.class, @selector(xy_dealloc)));
+        Class class = [self class];
+        
+        SEL originSelector = NSSelectorFromString(@"dealloc");
+        SEL swizzledSelector = @selector(xy_dealloc);
+        Method originMethod = class_getInstanceMethod(class, originSelector);
+        Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
+        
+        BOOL didAddMethod = class_addMethod(class,
+                                            originSelector,
+                                            method_getImplementation(swizzledMethod),
+                                            method_getTypeEncoding(swizzledMethod));
+        if (didAddMethod) {
+            class_replaceMethod(class,
+                                swizzledSelector,
+                                method_getImplementation(originMethod),
+                                method_getTypeEncoding(originMethod));
+        } else {
+            method_exchangeImplementations(originMethod, swizzledMethod);
+        }
     });
     
     
@@ -119,6 +144,10 @@
 }
 
 - (void)xy_dealloc {
+    XYNavigationBar *navigationBar = objc_getAssociatedObject(self, @selector(xy_navigationBar));
+    if (!navigationBar) {
+        return;
+    }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarFrameNotification object:nil];
     [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionAllowUserInteraction animations:^{
         self.xy_navigationBar.alpha = 0.0;
