@@ -22,6 +22,11 @@
 
 @end
 
+@interface UIViewController ()
+
+@property (nonatomic) XYNavigationBar *xy_navigationBar;
+
+@end
 
 @implementation UIViewController (XYNavigationBar)
 
@@ -30,6 +35,8 @@
     dispatch_once(&onceToken, ^{
         method_exchangeImplementations(class_getInstanceMethod(self.class, NSSelectorFromString(@"dealloc")),
                                        class_getInstanceMethod(self.class, @selector(xy_dealloc)));
+        method_exchangeImplementations(class_getInstanceMethod(self.class, @selector(viewWillLayoutSubviews)),
+                                       class_getInstanceMethod(self.class, @selector(xy_viewWillLayoutSubviews)));
     });
     
     
@@ -37,21 +44,18 @@
 
 - (XYNavigationBar *)xy_navigationBar {
     
-    NSUInteger foundIndex = [self.view.subviews indexOfObjectPassingTest:^BOOL(__kindof UIView * _Nonnull subview, NSUInteger idx, BOOL * _Nonnull stop) {
-        BOOL res = [subview isKindOfClass:[XYNavigationBar class]];
-        if (res) {
-            *stop = YES;
-        }
-        return res;
-    }];
-
-    if (foundIndex != NSNotFound) {
-        return self.view.subviews[foundIndex];
+    XYNavigationBar *navigationBar = objc_getAssociatedObject(self, _cmd);
+    if (navigationBar) {
+        return navigationBar;
     }
-    
-    XYNavigationBar *navigationBar = [[XYNavigationBar alloc] init];
+    navigationBar = [[XYNavigationBar alloc] init];
+    objc_setAssociatedObject(self, _cmd, navigationBar, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     navigationBar.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:navigationBar];
+    UIView *superView = self.view;
+    if ([self.view isKindOfClass:[UIScrollView class]]) {
+        superView = [UIApplication sharedApplication].keyWindow.rootViewController.view;
+    }
+    [superView addSubview:navigationBar];
     NSDictionary *subviewDict = @{@"nacBar": navigationBar};
     NSArray *contentViewConstraints = @[
                                         [NSLayoutConstraint constraintsWithVisualFormat:@"V:[nacBar(>=0)]"
@@ -64,7 +68,7 @@
                                                                                   views:subviewDict]
                                         ];
     
-    [self.view addConstraints:[contentViewConstraints valueForKeyPath:@"@unionOfArrays.self"]];
+    [superView addConstraints:[contentViewConstraints valueForKeyPath:@"@unionOfArrays.self"]];
     XYNavigationBarHeight barHeight = {64.0, 44.0};
     self.xy_navigationBarHeight = barHeight;
     [self registerNotificationObserver];
@@ -76,6 +80,13 @@
     
 
     return navigationBar;
+}
+
+- (void)setXy_navigationBar:(XYNavigationBar *)xy_navigationBar {
+    if (self.xy_navigationBar == xy_navigationBar) {
+        return;
+    }
+    objc_setAssociatedObject(self, @selector(setXy_navigationBar:), xy_navigationBar, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)setXy_navigationBarHeight:(XYNavigationBarHeight)xy_navigationBarHeight {
@@ -105,8 +116,13 @@
 
 - (void)xy_dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarFrameNotification object:nil];
+    [self.xy_navigationBar removeFromSuperview];
+    [self setXy_navigationBar:nil];
 }
 
+- (void)xy_viewWillLayoutSubviews {
+    
+}
 
 - (void)xy_willChangeStatusBarOrientationNotification {
     CGFloat navigationBarHeight = 0.0;
@@ -117,12 +133,12 @@
         navigationBarHeight = self.xy_navigationBarHeight.otherOrientationPortrait;
     }
     
-    NSInteger foundIndex = [self.view.constraints indexOfObjectPassingTest:^BOOL(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    NSInteger foundIndex = [self.xy_navigationBar.constraints indexOfObjectPassingTest:^BOOL(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         return [obj.identifier isEqualToString:@"topBarConstraintHeight"];
     }];
     
     if (foundIndex != NSNotFound) {
-        NSLayoutConstraint *constraint = [self.view.constraints objectAtIndex:foundIndex];
+        NSLayoutConstraint *constraint = [self.xy_navigationBar.constraints objectAtIndex:foundIndex];
         constraint.constant = navigationBarHeight;
         
     }
@@ -130,7 +146,7 @@
         
         NSLayoutConstraint *contentViewHConst = [NSLayoutConstraint constraintWithItem:self.xy_navigationBar attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:kNilOptions attribute:kNilOptions multiplier:0.0 constant:navigationBarHeight];
         contentViewHConst.identifier = @"topBarConstraintHeight";
-        [self.view addConstraint:contentViewHConst];
+        [self.xy_navigationBar addConstraint:contentViewHConst];
     }
     
 }
@@ -417,7 +433,12 @@
 
 - (void)updateConstraints {
     [super updateConstraints];
-    [self removeConstraints:self.constraints];
+//    [self removeConstraints:self.constraints];
+    for (NSLayoutConstraint *constr in self.constraints.copy ) {
+        if (![constr.firstItem isEqual:self]) {
+            [self removeConstraint:constr];
+        }
+    }
     [self.contentView removeConstraints:self.contentView.constraints];
     
     NSDictionary *views = NSDictionaryOfVariableBindings(_contentView, _shadowLineView);
@@ -559,10 +580,11 @@
 - (void)didMoveToSuperview {
     
     [super didMoveToSuperview];
+
     UIResponder *responder = self.nextResponder;
     do {
         responder = responder.nextResponder;
-    } while (![responder isKindOfClass:[UIViewController class]]);
+    } while (responder && ![responder isKindOfClass:[UIViewController class]]);
     
     if (responder) {
         UIViewController *vc = (UIViewController *)responder;

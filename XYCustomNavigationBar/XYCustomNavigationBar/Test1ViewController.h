@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "UIViewController+XYNavigationBar.h"
 
 @interface Test1ViewController : UIViewController
 

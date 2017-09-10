@@ -32,6 +32,10 @@
 
 }
 
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    
+}
 
 - (void)rightButtonClick {
     
@@ -53,7 +57,8 @@
 
 - (IBAction)pushClick:(id)sender {
     
-    Test1ViewController *nextVc = [Test1ViewController new];
+    UIStoryboard *nextStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    Test1ViewController *nextVc = [nextStoryboard instantiateViewControllerWithIdentifier:@"test1"];
     nextVc.view.backgroundColor = [UIColor whiteColor];
     nextVc.xy_navigationBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
@@ -67,6 +72,7 @@
 
     return UIStatusBarStyleLightContent;
 }
+
 
 
 @end

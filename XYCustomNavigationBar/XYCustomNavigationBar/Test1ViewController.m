@@ -23,6 +23,17 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+- (IBAction)push:(id)sender {
+    
+    UITableViewController *nextVc = [UITableViewController new];
+    nextVc.view.backgroundColor = [UIColor whiteColor];
+    nextVc.xy_navigationBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
+    
+    UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [titleButton setTitle:@"table view controller" forState:UIControlStateNormal];
+    nextVc.xy_navigationBar.titleView = titleButton;
+    [self.navigationController pushViewController:nextVc animated:YES];
+}
 
 /*
 #pragma mark - Navigation
@@ -35,7 +46,7 @@
 */
 
 - (void)dealloc {
-    
+    NSLog(@"%s", __FUNCTION__);
 }
 
 
