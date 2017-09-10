@@ -35,8 +35,6 @@
     dispatch_once(&onceToken, ^{
         method_exchangeImplementations(class_getInstanceMethod(self.class, NSSelectorFromString(@"dealloc")),
                                        class_getInstanceMethod(self.class, @selector(xy_dealloc)));
-        method_exchangeImplementations(class_getInstanceMethod(self.class, @selector(viewWillLayoutSubviews)),
-                                       class_getInstanceMethod(self.class, @selector(xy_viewWillLayoutSubviews)));
     });
     
     
@@ -54,7 +52,9 @@
     UIView *superView = self.view;
     if ([self.view isKindOfClass:[UIScrollView class]]) {
         superView = [UIApplication sharedApplication].keyWindow.rootViewController.view;
+        navigationBar.alpha = 0.0;
     }
+
     [superView addSubview:navigationBar];
     NSDictionary *subviewDict = @{@"nacBar": navigationBar};
     NSArray *contentViewConstraints = @[
@@ -77,7 +77,11 @@
     self.xy_navigationBar.leftButtonClick = ^{
         [selfVc backBtnClick];
     };
-    
+    if ([self.view isKindOfClass:[UIScrollView class]]) {
+        [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionAllowUserInteraction animations:^{
+            navigationBar.alpha = 1.0;
+        } completion:NULL];
+    }
 
     return navigationBar;
 }
@@ -116,12 +120,12 @@
 
 - (void)xy_dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarFrameNotification object:nil];
-    [self.xy_navigationBar removeFromSuperview];
-    [self setXy_navigationBar:nil];
-}
-
-- (void)xy_viewWillLayoutSubviews {
-    
+    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionAllowUserInteraction animations:^{
+        self.xy_navigationBar.alpha = 0.0;
+    } completion:^(BOOL finished) {
+        [self.xy_navigationBar removeFromSuperview];
+        [self setXy_navigationBar:nil];
+    }];
 }
 
 - (void)xy_willChangeStatusBarOrientationNotification {

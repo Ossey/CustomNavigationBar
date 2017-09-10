@@ -62,9 +62,12 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Mn-rA-TkT">
-                                <rect key="frame" x="181" y="261" width="34" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Mn-rA-TkT">
+                                <rect key="frame" x="0.0" y="303.5" width="375" height="60"/>
+                                <color key="backgroundColor" red="0.1313181628" green="0.6738150168" blue="0.48875314600000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="Hjo-Ma-ZsZ"/>
+                                </constraints>
                                 <state key="normal" title="push"/>
                                 <connections>
                                     <action selector="push:" destination="rLV-Nq-cCj" eventType="touchUpInside" id="BQ2-JK-0LW"/>
@@ -72,11 +75,16 @@
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="3Mn-rA-TkT" firstAttribute="leading" secondItem="sa0-a7-Yp1" secondAttribute="leading" id="DZx-O4-laN"/>
+                            <constraint firstItem="3Mn-rA-TkT" firstAttribute="centerY" secondItem="sa0-a7-Yp1" secondAttribute="centerY" id="ISV-e9-hL1"/>
+                            <constraint firstAttribute="trailing" secondItem="3Mn-rA-TkT" secondAttribute="trailing" id="dRh-rL-qiD"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yvH-YG-Qe9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1944" y="134"/>
+            <point key="canvasLocation" x="1943.2" y="133.5832083958021"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="rA6-mW-woH">
