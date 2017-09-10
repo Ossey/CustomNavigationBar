@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+typedef struct  {
+    float portraitOrientationHeight;
+    float otherOrientationPortrait;
+}XYNavigationBarHeight;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -47,6 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface UIViewController (XYNavigationBar)
 
 @property (nonatomic, readonly) XYNavigationBar *xy_navigationBar;
+@property (nonatomic) XYNavigationBarHeight xy_navigationBarHeight;
 
 - (void)backBtnClick;
 

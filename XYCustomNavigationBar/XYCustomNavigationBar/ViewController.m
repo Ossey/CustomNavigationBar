@@ -27,6 +27,8 @@
     self.xy_navigationBar.rightButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.xy_navigationBar.rightButton setTitle:@"右侧" forState:UIControlStateNormal];
     [self.xy_navigationBar.rightButton addTarget:self action:@selector(rightButtonClick) forControlEvents:UIControlEventTouchDown];
+    
+    [self setXy_navigationBarHeight:(XYNavigationBarHeight){100.0, 64.0}];
 
 }
 
@@ -46,7 +48,7 @@
     [self.xy_navigationBar setLeftButtonTitle:@"back" image:nil forState:UIControlStateNormal];
     nextVc.xy_navigationBar.titleColor = [UIColor whiteColor];
     [self showDetailViewController:nextVc sender:self];
-    nextVc.xy_navigationBar.shadowLineHeight = 2.0;
+    nextVc.xy_navigationBar.shadowLineHeight = 0.0;
 }
 
 - (IBAction)pushClick:(id)sender {
@@ -56,7 +58,7 @@
     nextVc.xy_navigationBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
     UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [titleButton setTitle:@"XYNavigationBarController" forState:UIControlStateNormal];
+    [titleButton setTitle:@"XYNavigationBarController_neeeueueuueu" forState:UIControlStateNormal];
     nextVc.xy_navigationBar.titleView = titleButton;
     [self.navigationController pushViewController:nextVc animated:YES];
 }

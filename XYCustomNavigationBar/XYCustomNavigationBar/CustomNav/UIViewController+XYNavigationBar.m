@@ -44,7 +44,7 @@
         }
         return res;
     }];
-    
+
     if (foundIndex != NSNotFound) {
         return self.view.subviews[foundIndex];
     }
@@ -54,7 +54,7 @@
     [self.view addSubview:navigationBar];
     NSDictionary *subviewDict = @{@"nacBar": navigationBar};
     NSArray *contentViewConstraints = @[
-                                        [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[nacBar]"
+                                        [NSLayoutConstraint constraintsWithVisualFormat:@"V:[nacBar(>=0)]"
                                                                                 options:0
                                                                                 metrics:nil
                                                                                   views:subviewDict],
@@ -65,8 +65,9 @@
                                         ];
     
     [self.view addConstraints:[contentViewConstraints valueForKeyPath:@"@unionOfArrays.self"]];
-    [self xy_willChangeStatusBarOrientationNotification];
-    [self registerNotification];
+    XYNavigationBarHeight barHeight = {64.0, 44.0};
+    self.xy_navigationBarHeight = barHeight;
+    [self registerNotificationObserver];
     
     __weak typeof(self) selfVc = self;
     self.xy_navigationBar.leftButtonClick = ^{
@@ -77,12 +78,25 @@
     return navigationBar;
 }
 
-- (BOOL)registerNotification {
+- (void)setXy_navigationBarHeight:(XYNavigationBarHeight)xy_navigationBarHeight {
+    NSValue *heightValue = [NSValue valueWithBytes:&xy_navigationBarHeight objCType:@encode(XYNavigationBarHeight)];
+    objc_setAssociatedObject(self, @selector(xy_navigationBarHeight), heightValue, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self xy_willChangeStatusBarOrientationNotification];
+}
+
+- (XYNavigationBarHeight)xy_navigationBarHeight {
+    XYNavigationBarHeight height;
+    NSValue *heightValue = objc_getAssociatedObject(self, _cmd);
+    [heightValue getValue:&height];
+    return height;
+}
+
+- (BOOL)registerNotificationObserver {
     BOOL flag = [objc_getAssociatedObject(self, _cmd) boolValue];
     if (!flag) {
         flag = YES;
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xy_willChangeStatusBarOrientationNotification) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(xy_willChangeStatusBarOrientationNotification) name:UIApplicationDidChangeStatusBarFrameNotification object:nil];
         
         objc_setAssociatedObject(self, _cmd, @(flag), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
@@ -90,17 +104,17 @@
 }
 
 - (void)xy_dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarFrameNotification object:nil];
 }
 
 
 - (void)xy_willChangeStatusBarOrientationNotification {
     CGFloat navigationBarHeight = 0.0;
-    if (UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation)) {
-        navigationBarHeight = 44;
-    }
-    else {
-        navigationBarHeight = 64;
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (orientation == UIDeviceOrientationPortrait) {
+        navigationBarHeight = self.xy_navigationBarHeight.portraitOrientationHeight;
+    } else {
+        navigationBarHeight = self.xy_navigationBarHeight.otherOrientationPortrait;
     }
     
     NSInteger foundIndex = [self.view.constraints indexOfObjectPassingTest:^BOOL(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -124,14 +138,13 @@
 - (BOOL)isPresent {
     
     BOOL isPresent;
-    
     NSArray *viewcontrollers = self.navigationController.viewControllers;
     
     if (viewcontrollers.count > 1 && [viewcontrollers objectAtIndex:viewcontrollers.count - 1] == self) {
-        isPresent = NO; // push方式
+        isPresent = NO;  // push
     }
     else {
-        isPresent = YES;  // modal方式
+        isPresent = YES; // modal
     }
     
     return isPresent;
@@ -222,6 +235,10 @@
 - (void)setHiddenLeftButton:(BOOL)hiddenLeftButton {
     _hiddenLeftButton = hiddenLeftButton;
     self.leftButton.hidden = hiddenLeftButton;
+}
+
+- (BOOL)isHiddenLeftButton {
+    return _leftButton.isHidden;
 }
 
 - (void)setTitleView:(UIView *)titleView {
@@ -456,14 +473,15 @@
         NSDictionary *views = NSDictionaryOfVariableBindings(_titleView);
         [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.titleView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0]];
         [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_titleView(rightBtnH)]|" options:kNilOptions metrics:metrics views:views]];
-        if ([self canShowLeftButton]) {
-            [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.titleView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:self.leftButton attribute:NSLayoutAttributeRight multiplier:1.0 constant:0.0]];
+        if ([self canShowLeftButton] && !self.isHiddenLeftButton) {
+            [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.titleView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:self.leftButton attribute:NSLayoutAttributeRight multiplier:1.0 constant:10.0]];
         }
         else {
             [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.titleView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:self.contentView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0]];
         }
         if ([self canshowRightButton]) {
-            [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.titleView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationLessThanOrEqual toItem:self.rightButton attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0]];
+            NSLayoutConstraint *c = [NSLayoutConstraint constraintWithItem:self.titleView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationLessThanOrEqual toItem:self.rightButton attribute:NSLayoutAttributeLeft multiplier:1.0 constant:-0.0];
+            [self.contentView addConstraint:c];
         }
         else {
             [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.titleView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationLessThanOrEqual toItem:self.contentView attribute:NSLayoutAttributeRight multiplier:1.0 constant:0.0]];
