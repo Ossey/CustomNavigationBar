@@ -25,20 +25,23 @@
 @property (nonatomic, weak) UIButton *titleButton;
 /** 导航条左侧返回按钮的文字，这个属性在当前控制器下有效 */
 @property (nonatomic, copy) NSString *leftButtonTitle;
-
+/** contentView 顶部距离父控件的间距，默认：横屏0，竖屏-20.0 */
+@property (nonatomic, assign) CGFloat contentViewTopConst;
+@property (nonatomic, strong) UIImageView *backgroundView;
 
 @end
 
 @interface UIViewController ()
 
 @property (nonatomic) XYNavigationBar *xy_navigationBar;
+@property (nonatomic) CGFloat xy_navigationBarTopConstant;
 
 @end
 
 @implementation UIViewController (XYNavigationBar)
 
 + (void)load {
-        
+    
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         [self exchangeImplementationWithSelector:NSSelectorFromString(@"dealloc") swizzledSelector:@selector(xy_dealloc)];
@@ -89,17 +92,23 @@
         superView = [UIApplication sharedApplication].keyWindow.rootViewController.view;
         navigationBar.alpha = 0.0;
     }
-
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (orientation == UIDeviceOrientationPortrait) {
+        self.xy_navigationBarTopConstant = 20.0;
+    } else {
+        self.xy_navigationBarTopConstant = 0.0;
+    }
     [superView addSubview:navigationBar];
     NSDictionary *subviewDict = @{@"nacBar": navigationBar};
+    NSDictionary *metrics = @{@"navigationBarTop": @(self.xy_navigationBarTopConstant)};
     NSArray *contentViewConstraints = @[
-                                        [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[nacBar(>=0)]"
+                                        [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(==navigationBarTop)-[nacBar(>=0)]"
                                                                                 options:0
-                                                                                metrics:nil
+                                                                                metrics:metrics
                                                                                   views:subviewDict],
                                         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[nacBar]|"
                                                                                 options:0
-                                                                                metrics:nil
+                                                                                metrics:metrics
                                                                                   views:subviewDict]
                                         ];
     
@@ -117,7 +126,7 @@
             navigationBar.alpha = 1.0;
         } completion:NULL];
     }
-
+    
     return navigationBar;
 }
 
@@ -168,15 +177,24 @@
 }
 
 - (void)xy_willChangeStatusBarOrientationNotification {
+    XYNavigationBar *navigationBar = objc_getAssociatedObject(self, @selector(xy_navigationBar));
+    if (!navigationBar) {
+        return;
+    }
     CGFloat navigationBarHeight = 0.0;
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
     if (orientation == UIDeviceOrientationPortrait) {
         navigationBarHeight = self.xy_navigationBarHeight.portraitOrientationHeight;
+        navigationBar.contentViewTopConst = -20.0;
+        self.xy_navigationBarTopConstant = 20.0;
     } else {
-        navigationBarHeight = self.xy_navigationBarHeight.otherOrientationPortrait;
+        navigationBarHeight = self.xy_navigationBarHeight.otherOrientationHeight;
+        navigationBar.contentViewTopConst = 0.0;
+        self.xy_navigationBarTopConstant = 0.0;
     }
     
-    NSInteger foundIndex = [self.xy_navigationBar.constraints indexOfObjectPassingTest:^BOOL(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    // 修改navigationBar的高度
+    NSInteger foundIndex = [navigationBar.constraints indexOfObjectPassingTest:^BOOL(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         return [obj.identifier isEqualToString:@"topBarConstraintHeight"];
     }];
     
@@ -187,11 +205,23 @@
     }
     else {
         
-        NSLayoutConstraint *contentViewHConst = [NSLayoutConstraint constraintWithItem:self.xy_navigationBar attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:kNilOptions multiplier:1.0 constant:navigationBarHeight];
+        NSLayoutConstraint *contentViewHConst = [NSLayoutConstraint constraintWithItem:navigationBar attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:kNilOptions multiplier:1.0 constant:navigationBarHeight];
         contentViewHConst.identifier = @"topBarConstraintHeight";
         [self.xy_navigationBar addConstraint:contentViewHConst];
     }
     
+    // 修改navigationBar的top
+    NSInteger foundNavigationTopConstraintIndex = [navigationBar.superview.constraints indexOfObjectPassingTest:^BOOL(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        BOOL res = [obj.firstItem isEqual:navigationBar] && obj.firstAttribute == NSLayoutAttributeTop;
+        if (res) {
+            *stop = YES;
+        }
+        return res;
+    }];
+    if (foundNavigationTopConstraintIndex != NSNotFound) {
+        NSLayoutConstraint *constraint = [navigationBar.superview.constraints objectAtIndex:foundNavigationTopConstraintIndex];
+        constraint.constant = self.xy_navigationBarTopConstant;
+    }
 }
 
 - (BOOL)isPresent {
@@ -238,6 +268,15 @@
     }
 }
 
+#pragma mark -
+
+- (CGFloat)xy_navigationBarTopConstant {
+    return [objc_getAssociatedObject(self, _cmd) doubleValue];;
+}
+
+- (void)setXy_navigationBarTopConstant:(CGFloat)xy_navigationBarTopConstant {
+    objc_setAssociatedObject(self, @selector(xy_navigationBarTopConstant), @(xy_navigationBarTopConstant), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
 
 @end
 
@@ -272,6 +311,25 @@
 }
 
 #pragma mark - Set \ Get
+
+- (void)setBackgroundColor:(UIColor *)backgroundColor {
+    [super setBackgroundColor:backgroundColor];
+    self.backgroundView.image = [[self class] xy_imageFromColor:backgroundColor];
+}
+
+- (void)setContentViewTopConst:(CGFloat)contentViewTopConst {
+    _contentViewTopConst = contentViewTopConst;
+    if (!self.constraints.count) {
+        return;
+    }
+    NSPredicate *contentViewTopPredicate = [NSPredicate predicateWithFormat:@"identifier == %@", @"XYNavigationBarContentViewTopConstraint"];
+    NSLayoutConstraint *contentViewTopConstraint = [self.constraints filteredArrayUsingPredicate:contentViewTopPredicate].firstObject;
+    contentViewTopConstraint.constant = contentViewTopConst;
+    
+    NSPredicate *backgroundTopPredicate = [NSPredicate predicateWithFormat:@"identifier == %@", @"XYNavigationBarBackgroundTopConstraint"];
+    NSLayoutConstraint *backgroundTopConstraint = [self.constraints filteredArrayUsingPredicate:backgroundTopPredicate].firstObject;
+    backgroundTopConstraint.constant = contentViewTopConst;
+}
 
 - (UIColor *)titleColor {
     
@@ -328,7 +386,7 @@
     }
     NSParameterAssert(!titleView.superview);
     _titleView = titleView;
-    if (![_titleButton isEqual:_titleView]) {
+    if (_titleButton && ![_titleButton isEqual:_titleView]) {
         // 为了避免自定义的titleView与titleButton产生冲突
         _title = nil;
         [_titleButton removeFromSuperview];
@@ -444,7 +502,7 @@
         contentView.backgroundColor = [UIColor clearColor];
         contentView.userInteractionEnabled = YES;
         contentView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:contentView];
+        [self.backgroundView addSubview:contentView];
         _contentView = contentView;
     }
     return _contentView;
@@ -459,6 +517,18 @@
         _shadowLineView = shadowLineView;
     }
     return _shadowLineView;
+}
+
+- (UIImageView *)backgroundView {
+    if (_backgroundView == nil) {
+        UIImageView *backgroundView = [[UIImageView alloc] init];
+        backgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:backgroundView];
+        _backgroundView = backgroundView;
+        _backgroundView.image = [[self class] xy_imageFromColor:[UIColor colorWithWhite:1.0 alpha:0.8]];
+        backgroundView.userInteractionEnabled = YES;
+    }
+    return _backgroundView;
 }
 
 - (void)setLeftButtonTitle:(nullable NSString *)title image:(nullable UIImage *)image forState:(UIControlState)state {
@@ -496,30 +566,53 @@
 #pragma mark - Private (auto layout)
 
 - (void)updateConstraints {
-    [super updateConstraints];
+    
     for (NSLayoutConstraint *constr in self.constraints.copy ) {
         if (![constr.firstItem isEqual:self]) {
             [self removeConstraint:constr];
         }
     }
     [self.contentView removeConstraints:self.contentView.constraints];
+    [self.backgroundView removeConstraints:self.backgroundView.constraints];
     
-    NSDictionary *views = NSDictionaryOfVariableBindings(_contentView, _shadowLineView);
-    NSDictionary *metrics = @{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width+10), @"leftButtonLeftM": @10, @"leftBtnH": @44, @"rightBtnH": @44, @"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width+10), @"shadowLineHeight": @(self.shadowLineHeight)};
+    NSDictionary *views = NSDictionaryOfVariableBindings(_contentView, _shadowLineView, _backgroundView);
+    NSDictionary *metrics = @{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width+10), @"leftButtonLeftM": @10, @"leftBtnH": @44, @"rightBtnH": @44, @"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width+10), @"shadowLineHeight": @(self.shadowLineHeight), @"contentViewTopConst": @(self.contentViewTopConst)};
     
+    NSLayoutConstraint *backgroundTopConstraint = [NSLayoutConstraint constraintWithItem:self.backgroundView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:self.contentViewTopConst];
+    backgroundTopConstraint.identifier = @"XYNavigationBarBackgroundTopConstraint";
+    // backgroundView
+    NSArray *backgroundViewConstraints = @[
+                                           [NSLayoutConstraint constraintsWithVisualFormat:@"V:[_backgroundView]|"
+                                                                                   options:0
+                                                                                   metrics:nil
+                                                                                     views:views],
+                                           [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_backgroundView]|"
+                                                                                   options:0
+                                                                                   metrics:nil
+                                                                                     views:views],
+                                           @[backgroundTopConstraint],
+                                           ];
+    
+    [self addConstraints:[backgroundViewConstraints valueForKeyPath:@"@unionOfArrays.self"]];
+    
+    // contentView
+    NSLayoutConstraint *contentViewTopConstraint = [NSLayoutConstraint constraintWithItem:self.contentView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:self.contentViewTopConst];
+    contentViewTopConstraint.identifier = @"XYNavigationBarContentViewTopConstraint";
     NSArray *contentViewConstraints = @[
-                                        [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_contentView]|"
+                                        [NSLayoutConstraint constraintsWithVisualFormat:@"V:[_contentView]|"
                                                                                 options:0
                                                                                 metrics:nil
                                                                                   views:views],
                                         [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_contentView]|"
                                                                                 options:0
                                                                                 metrics:nil
-                                                                                  views:views]
+                                                                                  views:views],
+                                        @[contentViewTopConstraint],
                                         ];
     
     [self addConstraints:[contentViewConstraints valueForKeyPath:@"@unionOfArrays.self"]];
     
+    // other
     if ([self canShowShadowLineView]) {
         
         [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_shadowLineView]|" options:kNilOptions metrics:metrics views:views]];
@@ -576,6 +669,8 @@
         [_titleView removeFromSuperview];
         _titleView = nil;
     }
+    
+    [super updateConstraints];
 }
 
 
@@ -630,6 +725,12 @@
     [self.leftButton addTarget:self action:@selector(leftBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     _hiddenLeftButton = NO;
     self.shadowLineHeight = 0.5;
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (orientation == UIDeviceOrientationPortrait) {
+        self.contentViewTopConst = -20.0;
+    } else {
+        self.contentViewTopConst = 0.0;
+    }
     
 }
 
@@ -643,7 +744,7 @@
 - (void)didMoveToSuperview {
     
     [super didMoveToSuperview];
-
+    
     UIResponder *responder = self.nextResponder;
     do {
         responder = responder.nextResponder;
@@ -662,6 +763,18 @@
     UIView *touchView = [super hitTest:point withEvent:event];
     
     return touchView;
+}
+
+#pragma mark - Other
++ (UIImage *)xy_imageFromColor:(UIColor *)color {
+    CGRect rect = CGRectMake(0, 0, 1, 1);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
 }
 
 @end

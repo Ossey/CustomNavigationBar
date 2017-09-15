@@ -10,7 +10,7 @@
 
 typedef struct  {
     float portraitOrientationHeight;
-    float otherOrientationPortrait;
+    float otherOrientationHeight;
 }XYNavigationBarHeight;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -40,9 +40,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** 是否隐藏导航条左侧按钮，默认隐藏 */
 @property (nonatomic, assign, getter=isHiddenLeftButton) BOOL hiddenLeftButton;
 
-- (void)setLeftButtonTitle:(nullable NSString *)title image:(nullable UIImage *)image forState:(UIControlState)state;
-
 @property (nonatomic, copy) void (^leftButtonClick)(void);
+
+- (void)setLeftButtonTitle:(nullable NSString *)title image:(nullable UIImage *)image forState:(UIControlState)state;
 
 @end
 
@@ -58,3 +58,4 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
