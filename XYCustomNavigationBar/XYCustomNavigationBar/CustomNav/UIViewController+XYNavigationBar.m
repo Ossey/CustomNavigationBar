@@ -17,6 +17,8 @@
 
 @interface UIView (XYNavigationBarExtension)
 
+@property BOOL onceInstanceContentOffsetOrContentInset;
+
 @end
 
 @interface XYNavigationBar ()
@@ -62,6 +64,7 @@
     dispatch_once(&onceToken, ^{
         [self exchangeImplementationWithSelector:NSSelectorFromString(@"dealloc") swizzledSelector:@selector(xy_dealloc)];
         [self exchangeImplementationWithSelector:@selector(viewWillAppear:) swizzledSelector:@selector(xy_viewWillAppear:)];
+        [self exchangeImplementationWithSelector:@selector(automaticallyAdjustsScrollViewInsets) swizzledSelector:@selector(xy_automaticallyAdjustsScrollViewInsets)];
     });
     
     
@@ -94,6 +97,44 @@
     
 }
 
+
+- (BOOL)xy_automaticallyAdjustsScrollViewInsets {
+    BOOL res = [self xy_automaticallyAdjustsScrollViewInsets];
+    XYNavigationBar *navigationBar = objc_getAssociatedObject(self, @selector(xy_navigationBar));
+    if (!navigationBar) {
+        return res;
+    }
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    CGFloat UIEdgeInsetsTop = 0.0, contentOffsetY = 0.0;
+    for (UIView *view in self.view.subviews) {
+        if ([view isKindOfClass:[UIScrollView class]]) {
+            UIScrollView *scrollView = (UIScrollView *)view;
+            if (res) {
+                if (orientation == UIDeviceOrientationPortrait) {
+                    UIEdgeInsetsTop = self.xy_navigationBar.xy_navigationBarHeight.portraitOrientationHeight;
+                    contentOffsetY = -UIEdgeInsetsTop - 20.0;
+                } else {
+                    UIEdgeInsetsTop = self.xy_navigationBar.xy_navigationBarHeight.otherOrientationHeight;
+                    contentOffsetY = -UIEdgeInsetsTop;
+                }
+            }
+            else {
+                UIEdgeInsetsTop = 0.0;
+            }
+            if (!scrollView.onceInstanceContentOffsetOrContentInset) {
+                scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, contentOffsetY);
+                scrollView.contentInset = UIEdgeInsetsMake(UIEdgeInsetsTop, scrollView.contentInset.left, scrollView.contentInset.bottom, scrollView.contentInset.right);
+                scrollView.onceInstanceContentOffsetOrContentInset = YES;
+            }
+        }
+    }
+    return res;
+}
+
+- (void)xy_willChangeStatusBarOrientation {
+    [self xy_automaticallyAdjustsScrollViewInsets];
+}
+
 - (XYNavigationBar *)xy_navigationBar {
     
     XYNavigationBar *navigationBar = objc_getAssociatedObject(self, _cmd);
@@ -101,13 +142,13 @@
         return navigationBar;
     }
     navigationBar = [[XYNavigationBar alloc] initWithView:self.view];
+    navigationBar.backgroundColor = [UIColor clearColor];
     objc_setAssociatedObject(self, _cmd, navigationBar, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     
     __weak typeof(self) selfVc = self;
-    self.xy_navigationBar.leftButtonClick = ^{
+    navigationBar.leftButtonClick = ^{
         [selfVc backBtnClick];
     };
-    navigationBar.backgroundColor = [UIColor clearColor];
     
     return navigationBar;
 }
@@ -895,6 +936,14 @@
         [self bringSubviewToFront:navigationBar];
     }
     
+}
+
+- (void)setOnceInstanceContentOffsetOrContentInset:(BOOL)onceInstanceContentOffsetOrContentInset {
+    objc_setAssociatedObject(self, @selector(onceInstanceContentOffsetOrContentInset), @(onceInstanceContentOffsetOrContentInset), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (BOOL)onceInstanceContentOffsetOrContentInset {
+    return [objc_getAssociatedObject(self, _cmd) boolValue];
 }
 
 @end
