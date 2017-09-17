@@ -1,5 +1,5 @@
 //
-//  UIViewController+XYNavigationBar.h
+//  UIViewController+XYCustomNavigationBar.h
 //  XYCustomNavigationBar
 //
 //  Created by Swae on 10/09/2017.
@@ -46,13 +46,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) XYNavigationBarHeight xy_navigationBarHeight;
 
+@property (nonatomic, strong) UIImage *backgroundImage;
+
 - (void)setLeftButtonTitle:(nullable NSString *)title image:(nullable UIImage *)image forState:(UIControlState)state;
 
 @end
 
 
-
-@interface UIViewController (XYNavigationBar)
+@interface UIViewController (XYCustomNavigationBar)
 
 @property (nonatomic, readonly) XYNavigationBar *xy_navigationBar;
 

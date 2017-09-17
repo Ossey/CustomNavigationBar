@@ -1,12 +1,12 @@
 //
-//  UIViewController+XYNavigationBar.m
+//  UIViewController+XYCustomNavigationBar.m
 //  XYCustomNavigationBar
 //
 //  Created by Swae on 10/09/2017.
 //  Copyright © 2017 Ossey. All rights reserved.
 //
 
-#import "UIViewController+XYNavigationBar.h"
+#import "UIViewController+XYCustomNavigationBar.h"
 #import <objc/runtime.h>
 
 @interface NSObject (XYSwizzlingExtension)
@@ -45,6 +45,8 @@
 
 @property (nonatomic) CGFloat xy_navigationBarTopConstant;
 
+@property (nonatomic, copy) void (^xy_willChangeStatusBarOrientationBlock)(void);
+
 - (instancetype)initWithView:(UIView *)view;
 
 - (void)resetSubviews;
@@ -56,7 +58,7 @@
 
 @end
 
-@implementation UIViewController (XYNavigationBar)
+@implementation UIViewController (XYCustomNavigationBar)
 
 + (void)load {
     
@@ -78,8 +80,13 @@
     }
     // 控制model和push时左侧返回按钮默认的隐藏和显示
     if (self.presentedViewController) {
-        if ([self.presentedViewController isKindOfClass:[UIViewController class]] && self.presentedViewController.navigationController.childViewControllers.count <= 1) {
-            navigationBar.hiddenLeftButton = YES;
+        if ([self.presentedViewController isKindOfClass:[UIViewController class]]) {
+            if (self.presentedViewController.navigationController && self.presentedViewController.navigationController.childViewControllers.count <= 1) {
+                navigationBar.hiddenLeftButton = YES;
+            }
+            else {
+                navigationBar.hiddenLeftButton = self.navigationController.childViewControllers.count <= 1;
+            }
         } else if ([self.presentedViewController isKindOfClass:[UINavigationController class]] && self.childViewControllers.count <= 1) {
             navigationBar.hiddenLeftButton = YES;
         }
@@ -97,7 +104,6 @@
     
 }
 
-
 - (BOOL)xy_automaticallyAdjustsScrollViewInsets {
     BOOL res = [self xy_automaticallyAdjustsScrollViewInsets];
     XYNavigationBar *navigationBar = objc_getAssociatedObject(self, @selector(xy_navigationBar));
@@ -112,11 +118,10 @@
             if (res) {
                 if (orientation == UIDeviceOrientationPortrait) {
                     UIEdgeInsetsTop = self.xy_navigationBar.xy_navigationBarHeight.portraitOrientationHeight;
-                    contentOffsetY = -UIEdgeInsetsTop - 20.0;
                 } else {
                     UIEdgeInsetsTop = self.xy_navigationBar.xy_navigationBarHeight.otherOrientationHeight;
-                    contentOffsetY = -UIEdgeInsetsTop;
                 }
+                contentOffsetY = -UIEdgeInsetsTop - 20.0;
             }
             else {
                 UIEdgeInsetsTop = 0.0;
@@ -132,6 +137,18 @@
 }
 
 - (void)xy_willChangeStatusBarOrientation {
+    
+    XYNavigationBar *navigationBar = objc_getAssociatedObject(self, @selector(xy_navigationBar));
+    if (!navigationBar) {
+        return;
+    }
+    for (UIView *view in self.view.subviews) {
+        if ([view isKindOfClass:[UIScrollView class]]) {
+            UIScrollView *scrollView = (UIScrollView *)view;
+            scrollView.onceInstanceContentOffsetOrContentInset = NO;
+        }
+    }
+    
     [self xy_automaticallyAdjustsScrollViewInsets];
 }
 
@@ -148,6 +165,10 @@
     __weak typeof(self) selfVc = self;
     navigationBar.leftButtonClick = ^{
         [selfVc backBtnClick];
+    };
+    
+    navigationBar.xy_willChangeStatusBarOrientationBlock = ^{
+        [selfVc xy_willChangeStatusBarOrientation];
     };
     
     return navigationBar;
@@ -262,6 +283,8 @@
     
     XYNavigationBarHeight barHeight = {64.0, 44.0};
     self.xy_navigationBarHeight = barHeight;
+    
+    [self.leftButton addTarget:self action:@selector(leftBtnClick:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 
@@ -477,7 +500,6 @@
         _leftButton = leftButton;
         leftButton.hidden = self.isHiddenLeftButton;
         leftButton.translatesAutoresizingMaskIntoConstraints = NO;
-        [leftButton addTarget:self action:@selector(leftBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _leftButton;
 }
@@ -554,6 +576,14 @@
     [self.leftButton setImage:image forState:state];
 }
 
+- (void)setBackgroundImage:(UIImage *)backgroundImage {
+    self.backgroundImageView.image = backgroundImage;
+}
+
+- (UIImage *)backgroundImage {
+    return self.backgroundImage;
+}
+
 - (void)setShadowLineHeight:(CGFloat)shadowLineHeight {
     if (_shadowLineHeight == shadowLineHeight) {
         return;
@@ -587,6 +617,9 @@
 #pragma mark - Notification
 
 - (void)xy_willChangeStatusBarOrientationNotification {
+    if (self.xy_willChangeStatusBarOrientationBlock) {
+        self.xy_willChangeStatusBarOrientationBlock();
+    }
     
     CGFloat navigationBarHeight = 0.0;
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
@@ -659,12 +692,18 @@
     [self addConstraints:[backgroundViewConstraints valueForKeyPath:@"@unionOfArrays.self"]];
     
     // backgroundImageView
-    [self addConstraints:@[
-                           [NSLayoutConstraint constraintWithItem:self.backgroundImageView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0],
-                           [NSLayoutConstraint constraintWithItem:self.backgroundImageView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0],
-                           [NSLayoutConstraint constraintWithItem:self.backgroundImageView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0],
-                           [NSLayoutConstraint constraintWithItem:self.backgroundImageView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeRight multiplier:1.0 constant:0.0],
-                           ]];
+    if ([self canShowBackgroundImageView]) {
+        [self addConstraints:@[
+                               [NSLayoutConstraint constraintWithItem:self.backgroundImageView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0],
+                               [NSLayoutConstraint constraintWithItem:self.backgroundImageView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0],
+                               [NSLayoutConstraint constraintWithItem:self.backgroundImageView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0],
+                               [NSLayoutConstraint constraintWithItem:self.backgroundImageView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeRight multiplier:1.0 constant:0.0],
+                               ]];
+    }
+    else {
+        [_backgroundImageView removeFromSuperview];
+        _backgroundImageView = nil;
+    }
     
     // visualEffectView
     [self addConstraints:@[
@@ -743,7 +782,7 @@
         if ([self canShowTitleView]) {
             NSDictionary *views = NSDictionaryOfVariableBindings(_titleView);
             [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.titleView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0]];
-            [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_titleView(rightBtnH)]|" options:kNilOptions metrics:metrics views:views]];
+            [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_titleView]|" options:kNilOptions metrics:metrics views:views]];
             if ([self canShowLeftButton] && !self.isHiddenLeftButton) {
                 [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.titleView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:self.leftButton attribute:NSLayoutAttributeRight multiplier:1.0 constant:10.0]];
             }
@@ -777,6 +816,10 @@
         return _leftButton.superview != nil;
     }
     return NO;
+}
+
+- (BOOL)canShowBackgroundImageView {
+    return _backgroundImageView.image && _backgroundImageView.superview;
 }
 
 - (BOOL)canShowTitleButton {
@@ -972,3 +1015,4 @@
 
 
 @end
+

@@ -7,7 +7,7 @@
 
 
 #import <UIKit/UIKit.h>
-#import "UIViewController+XYNavigationBar.h"
+#import "UIViewController+XYCustomNavigationBar.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

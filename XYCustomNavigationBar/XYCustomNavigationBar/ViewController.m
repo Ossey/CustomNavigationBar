@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "Test1ViewController.h"
+#import "ExploreViewController.h"
 
 @interface ViewController () 
 
@@ -39,8 +40,22 @@
 
 - (void)rightButtonClick {
     
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"知道了" message:nil delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:nil, nil];
-    [alertView show];
+    UIAlertController *alc = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    [alc addAction:[UIAlertAction actionWithTitle:@"push" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        
+        UIStoryboard *nextStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        Test1ViewController *nextVc = [nextStoryboard instantiateViewControllerWithIdentifier:@"test1"];
+        nextVc.view.backgroundColor = [UIColor whiteColor];
+        nextVc.xy_navigationBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
+        
+        UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [titleButton setTitle:@"XYNavigationBarController_neeeueueuueu" forState:UIControlStateNormal];
+        nextVc.xy_navigationBar.titleView = titleButton;
+        [self.navigationController pushViewController:nextVc animated:YES];
+    }]];
+    [alc addAction:[UIAlertAction actionWithTitle:@"cancel" style:UIAlertActionStyleCancel handler:NULL]];
+    [self presentViewController:alc animated:YES completion:NULL];
+    
 }
 
 - (IBAction)modalBtnClick:(id)sender {
@@ -49,23 +64,16 @@
     nextVc.xy_navigationBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
     
     nextVc.xy_navigationBar.title = @"自定义的导航条";
-    [self.xy_navigationBar setLeftButtonTitle:@"back" image:nil forState:UIControlStateNormal];
+    [nextVc.xy_navigationBar setLeftButtonTitle:@"back" image:nil forState:UIControlStateNormal];
     nextVc.xy_navigationBar.titleColor = [UIColor whiteColor];
     [self showDetailViewController:nextVc sender:self];
     nextVc.xy_navigationBar.shadowLineHeight = 0.0;
 }
 
 - (IBAction)pushClick:(id)sender {
+    ExploreViewController *vc = [ExploreViewController new];
+    [self showViewController:vc sender:self];
     
-    UIStoryboard *nextStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    Test1ViewController *nextVc = [nextStoryboard instantiateViewControllerWithIdentifier:@"test1"];
-    nextVc.view.backgroundColor = [UIColor whiteColor];
-    nextVc.xy_navigationBar.backgroundColor = [UIColor colorWithRed:57/255.0 green:217/255.0 blue:146/255.0 alpha:0.8];
-    
-    UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [titleButton setTitle:@"XYNavigationBarController_neeeueueuueu" forState:UIControlStateNormal];
-    nextVc.xy_navigationBar.titleView = titleButton;
-    [self.navigationController pushViewController:nextVc animated:YES];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {

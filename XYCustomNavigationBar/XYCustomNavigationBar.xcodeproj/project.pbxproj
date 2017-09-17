@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1808B0C61F64538A00934486 /* UIViewController+XYNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 1808B0C51F64538A00934486 /* UIViewController+XYNavigationBar.m */; };
+		1808B0C61F64538A00934486 /* UIViewController+XYCustomNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 1808B0C51F64538A00934486 /* UIViewController+XYCustomNavigationBar.m */; };
 		18586F461E0D480A0045F1C4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 18586F451E0D480A0045F1C4 /* main.m */; };
 		18586F491E0D480A0045F1C4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 18586F481E0D480A0045F1C4 /* AppDelegate.m */; };
 		18586F4C1E0D480A0045F1C4 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18586F4B1E0D480A0045F1C4 /* ViewController.m */; };
@@ -16,11 +16,14 @@
 		18586F541E0D480A0045F1C4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18586F521E0D480A0045F1C4 /* LaunchScreen.storyboard */; };
 		189E1AA41F64684300D9983C /* XYProfileBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 189E1AA31F64684200D9983C /* XYProfileBaseController.m */; };
 		189E1AA71F646C5300D9983C /* Test1ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 189E1AA61F646C5300D9983C /* Test1ViewController.m */; };
+		18F657161F6EADBA000F5F29 /* SearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18F657131F6EADB9000F5F29 /* SearchViewController.m */; };
+		18F657171F6EADBA000F5F29 /* ExploreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18F657151F6EADB9000F5F29 /* ExploreViewController.m */; };
+		18F6571A1F6EADC5000F5F29 /* XYSearchNavigationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 18F657191F6EADC5000F5F29 /* XYSearchNavigationView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1808B0C41F64538A00934486 /* UIViewController+XYNavigationBar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIViewController+XYNavigationBar.h"; sourceTree = "<group>"; };
-		1808B0C51F64538A00934486 /* UIViewController+XYNavigationBar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+XYNavigationBar.m"; sourceTree = "<group>"; };
+		1808B0C41F64538A00934486 /* UIViewController+XYCustomNavigationBar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIViewController+XYCustomNavigationBar.h"; sourceTree = "<group>"; };
+		1808B0C51F64538A00934486 /* UIViewController+XYCustomNavigationBar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+XYCustomNavigationBar.m"; sourceTree = "<group>"; };
 		18586F411E0D480A0045F1C4 /* XYCustomNavigationBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XYCustomNavigationBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18586F451E0D480A0045F1C4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		18586F471E0D480A0045F1C4 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -35,6 +38,12 @@
 		189E1AA31F64684200D9983C /* XYProfileBaseController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XYProfileBaseController.m; sourceTree = "<group>"; };
 		189E1AA51F646C5300D9983C /* Test1ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Test1ViewController.h; sourceTree = "<group>"; };
 		189E1AA61F646C5300D9983C /* Test1ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Test1ViewController.m; sourceTree = "<group>"; };
+		18F657121F6EADB9000F5F29 /* ExploreViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExploreViewController.h; sourceTree = "<group>"; };
+		18F657131F6EADB9000F5F29 /* SearchViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SearchViewController.m; sourceTree = "<group>"; };
+		18F657141F6EADB9000F5F29 /* SearchViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SearchViewController.h; sourceTree = "<group>"; };
+		18F657151F6EADB9000F5F29 /* ExploreViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExploreViewController.m; sourceTree = "<group>"; };
+		18F657181F6EADC5000F5F29 /* XYSearchNavigationView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XYSearchNavigationView.h; sourceTree = "<group>"; };
+		18F657191F6EADC5000F5F29 /* XYSearchNavigationView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XYSearchNavigationView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,8 +60,8 @@
 		183F94141E195B6B00875416 /* CustomNav */ = {
 			isa = PBXGroup;
 			children = (
-				1808B0C41F64538A00934486 /* UIViewController+XYNavigationBar.h */,
-				1808B0C51F64538A00934486 /* UIViewController+XYNavigationBar.m */,
+				1808B0C41F64538A00934486 /* UIViewController+XYCustomNavigationBar.h */,
+				1808B0C51F64538A00934486 /* UIViewController+XYCustomNavigationBar.m */,
 			);
 			path = CustomNav;
 			sourceTree = "<group>";
@@ -85,6 +94,12 @@
 				18586F4B1E0D480A0045F1C4 /* ViewController.m */,
 				189E1AA51F646C5300D9983C /* Test1ViewController.h */,
 				189E1AA61F646C5300D9983C /* Test1ViewController.m */,
+				18F657121F6EADB9000F5F29 /* ExploreViewController.h */,
+				18F657151F6EADB9000F5F29 /* ExploreViewController.m */,
+				18F657141F6EADB9000F5F29 /* SearchViewController.h */,
+				18F657131F6EADB9000F5F29 /* SearchViewController.m */,
+				18F657181F6EADC5000F5F29 /* XYSearchNavigationView.h */,
+				18F657191F6EADC5000F5F29 /* XYSearchNavigationView.m */,
 				18586F4D1E0D480A0045F1C4 /* Main.storyboard */,
 				18586F501E0D480A0045F1C4 /* Assets.xcassets */,
 				18586F521E0D480A0045F1C4 /* LaunchScreen.storyboard */,
@@ -174,12 +189,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				18F6571A1F6EADC5000F5F29 /* XYSearchNavigationView.m in Sources */,
+				18F657171F6EADBA000F5F29 /* ExploreViewController.m in Sources */,
 				189E1AA71F646C5300D9983C /* Test1ViewController.m in Sources */,
 				18586F4C1E0D480A0045F1C4 /* ViewController.m in Sources */,
 				189E1AA41F64684300D9983C /* XYProfileBaseController.m in Sources */,
 				18586F491E0D480A0045F1C4 /* AppDelegate.m in Sources */,
 				18586F461E0D480A0045F1C4 /* main.m in Sources */,
-				1808B0C61F64538A00934486 /* UIViewController+XYNavigationBar.m in Sources */,
+				1808B0C61F64538A00934486 /* UIViewController+XYCustomNavigationBar.m in Sources */,
+				18F657161F6EADBA000F5F29 /* SearchViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
