@@ -27,8 +27,9 @@
 @property (nonatomic, copy) NSString *leftButtonTitle;
 /** contentView 顶部距离父控件的间距，默认：横屏0，竖屏-20.0 */
 @property (nonatomic, assign) CGFloat backgroundViewTopConstant;
-@property (nonatomic, strong) UIImageView *backgroundImageView;
-@property (nonatomic, strong) UIView *backgroundView;
+@property (nonatomic, weak) UIImageView *backgroundImageView;
+@property (nonatomic, weak) UIView *backgroundView;
+@property (nonatomic, weak) UIVisualEffectView *visualEffectView;
 
 @property (nonatomic) CGFloat xy_navigationBarTopConstant;
 
@@ -265,11 +266,11 @@
         [_customView removeFromSuperview];
         _customView = nil;
     }
-    
     _customView = customView;
     _customView.translatesAutoresizingMaskIntoConstraints = NO;
     _customView.accessibilityIdentifier = @"customView";
     [self.contentView addSubview:_customView];
+    [_customView layoutIfNeeded];
 }
 
 - (void)setBackgroundViewTopConstant:(CGFloat)backgroundViewTopConstant {
@@ -456,7 +457,7 @@
         contentView.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:contentView];
         _contentView = contentView;
-        [self insertSubview:contentView aboveSubview:self.backgroundImageView];
+        [self insertSubview:contentView aboveSubview:self.visualEffectView];
     }
     return _contentView;
 }
@@ -475,10 +476,11 @@
 - (UIImageView *)backgroundImageView {
     if (_backgroundImageView == nil) {
         UIImageView *backgroundView = [[UIImageView alloc] init];
+        backgroundView.backgroundColor = [UIColor clearColor];
         backgroundView.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:backgroundView];
         _backgroundImageView = backgroundView;
-        _backgroundImageView.image = [[self class] xy_imageFromColor:[UIColor colorWithWhite:0.8 alpha:0.6]];
+        //        _backgroundImageView.image = [[self class] xy_imageFromColor:[UIColor colorWithWhite:1.0 alpha:0.8]];
         [self insertSubview:backgroundView aboveSubview:self.backgroundView];
     }
     return _backgroundImageView;
@@ -493,6 +495,19 @@
         [self insertSubview:backgroundView atIndex:0];
     }
     return _backgroundView;
+}
+- (UIVisualEffectView *)visualEffectView {
+    if (_visualEffectView == nil) {
+        UIBlurEffect *blurEffrct =[UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+        UIVisualEffectView *visualEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffrct];
+        visualEffectView.translatesAutoresizingMaskIntoConstraints = NO;
+        visualEffectView.alpha = 1.0;
+        [self addSubview:visualEffectView];
+        _visualEffectView = visualEffectView;
+        visualEffectView.userInteractionEnabled = NO;
+        
+    }
+    return _visualEffectView;
 }
 
 - (void)setLeftButtonTitle:(nullable NSString *)title image:(nullable UIImage *)image forState:(UIControlState)state {
@@ -531,14 +546,13 @@
         return;
     }
     _xy_navigationBarHeight = xy_navigationBarHeight;
-    [self setNeedsUpdateConstraints];
     [self xy_willChangeStatusBarOrientationNotification];
 }
 
 #pragma mark - Notification
 
 - (void)xy_willChangeStatusBarOrientationNotification {
-   
+    
     CGFloat navigationBarHeight = 0.0;
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
     if (orientation == UIDeviceOrientationPortrait) {
@@ -593,16 +607,15 @@
         }
     }
     [self.contentView removeConstraints:self.contentView.constraints];
-    [self.backgroundImageView removeConstraints:self.backgroundImageView.constraints];
-    [self.backgroundView removeConstraints:self.backgroundView.constraints];
+    //    [self.backgroundImageView removeConstraints:self.backgroundImageView.constraints];
     
-    NSDictionary *views = @{@"_contentView": self.contentView, @"_shadowLineView": self.shadowLineView, @"_backgroundImageView": self.backgroundImageView, @"_backgroundView": self.backgroundView}; 
+    NSDictionary *views = @{@"_contentView": self.contentView, @"_shadowLineView": self.shadowLineView, @"_backgroundImageView": self.backgroundImageView, @"_backgroundView": self.backgroundView, @"visualEffectView": self.visualEffectView};
     NSDictionary *metrics = @{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width+10), @"leftButtonLeftM": @10, @"leftBtnH": @44, @"rightBtnH": @44, @"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width+10), @"shadowLineHeight": @(self.shadowLineHeight), @"backgroundImageViewConstant": @(self.backgroundViewTopConstant)};
     
-     // backgroundView
+    // backgroundView
     NSLayoutConstraint *backgroundTopConstraint = [NSLayoutConstraint constraintWithItem:self.backgroundView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:self.backgroundViewTopConstant];
     backgroundTopConstraint.identifier = @"XYNavigationBarBackgroundTopConstraint";
-   
+    
     NSArray *backgroundViewConstraints = @[
                                            [NSLayoutConstraint constraintsWithVisualFormat:@"V:[_backgroundView]|"
                                                                                    options:0
@@ -623,6 +636,14 @@
                            [NSLayoutConstraint constraintWithItem:self.backgroundImageView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0],
                            [NSLayoutConstraint constraintWithItem:self.backgroundImageView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0],
                            [NSLayoutConstraint constraintWithItem:self.backgroundImageView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeRight multiplier:1.0 constant:0.0],
+                           ]];
+    
+    // visualEffectView
+    [self addConstraints:@[
+                           [NSLayoutConstraint constraintWithItem:self.visualEffectView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0],
+                           [NSLayoutConstraint constraintWithItem:self.visualEffectView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0],
+                           [NSLayoutConstraint constraintWithItem:self.visualEffectView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0],
+                           [NSLayoutConstraint constraintWithItem:self.visualEffectView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.backgroundView attribute:NSLayoutAttributeRight multiplier:1.0 constant:0.0],
                            ]];
     
     // contentView
@@ -798,7 +819,7 @@
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     [super willMoveToSuperview:newSuperview];
-
+    
     if (newSuperview && ([newSuperview isKindOfClass:[UIScrollView class]] || [newSuperview isKindOfClass:NSClassFromString(@"UILayoutContainerView")])) {
         [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionAllowUserInteraction animations:^{
             self.alpha = 1.0;
