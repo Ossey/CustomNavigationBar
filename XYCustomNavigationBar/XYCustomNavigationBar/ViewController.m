@@ -28,7 +28,7 @@
     [self.xy_navigationBar.rightButton setTitle:@"右侧" forState:UIControlStateNormal];
     [self.xy_navigationBar.rightButton addTarget:self action:@selector(rightButtonClick) forControlEvents:UIControlEventTouchDown];
     
-    [self setXy_navigationBarHeight:(XYNavigationBarHeight){100.0, 64.0}];
+    [self.xy_navigationBar setXy_navigationBarHeight:(XYNavigationBarHeight){100.0, 64.0}];
 
 }
 
