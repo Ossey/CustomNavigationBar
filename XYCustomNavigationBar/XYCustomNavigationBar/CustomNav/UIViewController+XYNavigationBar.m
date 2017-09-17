@@ -97,7 +97,7 @@
     self.xy_navigationBar.leftButtonClick = ^{
         [selfVc backBtnClick];
     };
-    
+    navigationBar.backgroundColor = [UIColor clearColor];
     
     return navigationBar;
 }
@@ -687,10 +687,10 @@
         }
         
         if ([self canShowLeftButton]) {
-            [metrics addEntriesFromDictionary:@{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width+10), @"leftButtonLeftM": @10, @"leftBtnH": @44}];
+            [metrics addEntriesFromDictionary:@{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width+10), @"leftButtonLeftM": @10}];
             NSDictionary *views = NSDictionaryOfVariableBindings(_leftButton);
             [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-leftButtonLeftM-[_leftButton(==leftButtonWidth)]" options:kNilOptions metrics:metrics views:views]];
-            [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_leftButton(leftBtnH)]|" options:kNilOptions metrics:metrics views:views]];
+            [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_leftButton]|" options:kNilOptions metrics:metrics views:views]];
         }
         else {
             [_leftButton removeFromSuperview];
@@ -698,10 +698,10 @@
         }
         
         if ([self canshowRightButton]) {
-            [metrics addEntriesFromDictionary:@{@"rightBtnH": @44, @"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width+10)}];
+            [metrics addEntriesFromDictionary:@{@"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width+10)}];
             NSDictionary *views = NSDictionaryOfVariableBindings(_rightButton);
             [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[_rightButton(==rightButtonWidth)]-rightBtnRightM-|" options:kNilOptions metrics:metrics views:views]];
-            [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_rightButton(rightBtnH)]|" options:kNilOptions metrics:metrics views:views]];
+            [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_rightButton]|" options:kNilOptions metrics:metrics views:views]];
         }
         else {
             [_rightButton removeFromSuperview];
