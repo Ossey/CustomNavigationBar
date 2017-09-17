@@ -265,7 +265,7 @@
         [_customView removeFromSuperview];
         _customView = nil;
     }
-    [customView removeConstraints:customView.constraints];
+    
     _customView = customView;
     _customView.translatesAutoresizingMaskIntoConstraints = NO;
     _customView.accessibilityIdentifier = @"customView";
@@ -593,7 +593,8 @@
         }
     }
     [self.contentView removeConstraints:self.contentView.constraints];
-//    [self.backgroundImageView removeConstraints:self.backgroundImageView.constraints];
+    [self.backgroundImageView removeConstraints:self.backgroundImageView.constraints];
+    [self.backgroundView removeConstraints:self.backgroundView.constraints];
     
     NSDictionary *views = @{@"_contentView": self.contentView, @"_shadowLineView": self.shadowLineView, @"_backgroundImageView": self.backgroundImageView, @"_backgroundView": self.backgroundView}; 
     NSDictionary *metrics = @{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width+10), @"leftButtonLeftM": @10, @"leftBtnH": @44, @"rightBtnH": @44, @"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width+10), @"shadowLineHeight": @(self.shadowLineHeight), @"backgroundImageViewConstant": @(self.backgroundViewTopConstant)};
