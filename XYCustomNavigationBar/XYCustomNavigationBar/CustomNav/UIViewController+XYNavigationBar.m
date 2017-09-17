@@ -34,6 +34,8 @@
 @property (nonatomic) CGFloat xy_navigationBarTopConstant;
 
 - (instancetype)initWithView:(UIView *)view;
+
+- (void)resetSubviews;
 @end
 
 @interface UIViewController ()
@@ -269,8 +271,8 @@
     _customView = customView;
     _customView.translatesAutoresizingMaskIntoConstraints = NO;
     _customView.accessibilityIdentifier = @"customView";
+    [self resetSubviews];
     [self.contentView addSubview:_customView];
-    [_customView layoutIfNeeded];
 }
 
 - (void)setBackgroundViewTopConstant:(CGFloat)backgroundViewTopConstant {
@@ -334,7 +336,7 @@
 
 - (void)setTitleView:(UIView *)titleView {
     
-    if ([_titleView isEqual:titleView]) {
+    if ([_titleView isEqual:titleView] || _customView) {
         return;
     }
     NSParameterAssert(!titleView.superview);
@@ -368,7 +370,7 @@
 }
 
 - (UIButton *)titleButton {
-    if (_titleButton == nil) {
+    if (_titleButton == nil && _customView == nil) {
         UIButton *titleButton = [UIButton buttonWithType:UIButtonTypeCustom];
         _titleButton = titleButton;
         self.titleView = titleButton;
@@ -432,7 +434,7 @@
 
 - (UIButton *)leftButton {
     
-    if (_leftButton == nil) {
+    if (_leftButton == nil && _customView == nil) {
         UIButton *leftButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [leftButton setTitle:self.leftButtonTitle forState:UIControlStateNormal];
         [leftButton setImage:self.leftButtonImage forState:UIControlStateNormal];
@@ -443,6 +445,7 @@
         _leftButton = leftButton;
         leftButton.hidden = self.isHiddenLeftButton;
         leftButton.translatesAutoresizingMaskIntoConstraints = NO;
+        [leftButton addTarget:self action:@selector(leftBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _leftButton;
 }
@@ -600,17 +603,10 @@
 #pragma mark - Private (auto layout)
 
 - (void)updateConstraints {
-    
-    for (NSLayoutConstraint *constr in self.constraints.copy ) {
-        if (![constr.firstItem isEqual:self]) {
-            [self removeConstraint:constr];
-        }
-    }
-    [self.contentView removeConstraints:self.contentView.constraints];
-    //    [self.backgroundImageView removeConstraints:self.backgroundImageView.constraints];
+    [self clearAllConstraints];
     
     NSDictionary *views = @{@"_contentView": self.contentView, @"_shadowLineView": self.shadowLineView, @"_backgroundImageView": self.backgroundImageView, @"_backgroundView": self.backgroundView, @"visualEffectView": self.visualEffectView};
-    NSDictionary *metrics = @{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width+10), @"leftButtonLeftM": @10, @"leftBtnH": @44, @"rightBtnH": @44, @"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width+10), @"shadowLineHeight": @(self.shadowLineHeight), @"backgroundImageViewConstant": @(self.backgroundViewTopConstant)};
+    NSMutableDictionary *metrics = @{@"backgroundImageViewConstant": @(self.backgroundViewTopConstant)}.mutableCopy;
     
     // backgroundView
     NSLayoutConstraint *backgroundTopConstraint = [NSLayoutConstraint constraintWithItem:self.backgroundView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:self.backgroundViewTopConstant];
@@ -678,7 +674,7 @@
         
         // other
         if ([self canShowShadowLineView]) {
-            
+            [metrics addEntriesFromDictionary:@{@"shadowLineHeight": @(self.shadowLineHeight)}];
             [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_shadowLineView]|" options:kNilOptions metrics:metrics views:views]];
             [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_shadowLineView]|" options:kNilOptions metrics:metrics views:views]];
             NSLayoutConstraint *shadowLineConstrainHeight = [NSLayoutConstraint constraintWithItem:self.shadowLineView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:self.shadowLineHeight];
@@ -691,6 +687,7 @@
         }
         
         if ([self canShowLeftButton]) {
+            [metrics addEntriesFromDictionary:@{@"leftButtonWidth": @(self.leftButton.intrinsicContentSize.width+10), @"leftButtonLeftM": @10, @"leftBtnH": @44}];
             NSDictionary *views = NSDictionaryOfVariableBindings(_leftButton);
             [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-leftButtonLeftM-[_leftButton(==leftButtonWidth)]" options:kNilOptions metrics:metrics views:views]];
             [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_leftButton(leftBtnH)]|" options:kNilOptions metrics:metrics views:views]];
@@ -701,6 +698,7 @@
         }
         
         if ([self canshowRightButton]) {
+            [metrics addEntriesFromDictionary:@{@"rightBtnH": @44, @"rightBtnRightM": @10, @"rightButtonWidth": @(self.rightButton.intrinsicContentSize.width+10)}];
             NSDictionary *views = NSDictionaryOfVariableBindings(_rightButton);
             [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[_rightButton(==rightButtonWidth)]-rightBtnRightM-|" options:kNilOptions metrics:metrics views:views]];
             [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_rightButton(rightBtnH)]|" options:kNilOptions metrics:metrics views:views]];
@@ -786,9 +784,7 @@
 
 - (void)setupCustomBar {
     
-    self.backgroundColor = [UIColor whiteColor];
     self.shadowLineView.backgroundColor = [UIColor colorWithWhite:160/255.0 alpha:0.7];
-    [self.leftButton addTarget:self action:@selector(leftBtnClick:) forControlEvents:UIControlEventTouchUpInside];
     _hiddenLeftButton = NO;
     self.shadowLineHeight = 0.5;
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
@@ -805,6 +801,24 @@
         self.leftButtonClick();
     }
     
+}
+
+- (void)resetSubviews {
+    [self.contentView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    _leftButton = nil;
+    _rightButton = nil;
+    _titleView = nil;
+    _titleButton = nil;
+    [self clearAllConstraints];
+}
+
+- (void)clearAllConstraints {
+    for (NSLayoutConstraint *constr in self.constraints.copy ) {
+        if (![constr.firstItem isEqual:self]) {
+            [self removeConstraint:constr];
+        }
+    }
+    [self.contentView removeConstraints:self.contentView.constraints];
 }
 
 - (void)removeFromSuperview {
