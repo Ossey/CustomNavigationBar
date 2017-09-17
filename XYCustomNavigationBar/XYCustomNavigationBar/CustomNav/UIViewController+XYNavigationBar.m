@@ -9,6 +9,16 @@
 #import "UIViewController+XYNavigationBar.h"
 #import <objc/runtime.h>
 
+@interface NSObject (XYSwizzlingExtension)
+
++ (void)exchangeImplementationWithSelector:(SEL)originSelector swizzledSelector:(SEL)swizzledSelector;
+
+@end
+
+@interface UIView (XYNavigationBarExtension)
+
+@end
+
 @interface XYNavigationBar ()
 
 /** 导航条contentView */
@@ -143,26 +153,6 @@
     }
 }
 
-#pragma mark - Swizzling
-+ (void)exchangeImplementationWithSelector:(SEL)originSelector swizzledSelector:(SEL)swizzledSelector {
-    Class class = [self class];
-    Method originMethod = class_getInstanceMethod(class, originSelector);
-    Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
-    
-    BOOL didAddMethod = class_addMethod(class,
-                                        originSelector,
-                                        method_getImplementation(swizzledMethod),
-                                        method_getTypeEncoding(swizzledMethod));
-    if (didAddMethod) {
-        class_replaceMethod(class,
-                            swizzledSelector,
-                            method_getImplementation(originMethod),
-                            method_getTypeEncoding(originMethod));
-    } else {
-        method_exchangeImplementations(originMethod, swizzledMethod);
-    }
-}
-
 #pragma mark -
 
 - (CGFloat)xy_navigationBarTopConstant {
@@ -211,6 +201,7 @@
         xy_navigationBarTopConstant = 0.0;
     }
     [superView addSubview:self];
+    [superView bringSubviewToFront:self];
     NSDictionary *subviewDict = @{@"nacBar": self};
     NSDictionary *metrics = @{@"navigationBarTop": @(xy_navigationBarTopConstant)};
     NSArray *contentViewConstraints = @[
@@ -880,3 +871,55 @@
 @end
 
 
+@implementation UIView (XYNavigationBarExtension)
+
++ (void)load {
+    [super load];
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self exchangeImplementationWithSelector:NSSelectorFromString(@"didMoveToSuperview") swizzledSelector:@selector(xy_didMoveToSuperview)];
+    });
+}
+
+- (void)xy_didMoveToSuperview {
+    NSUInteger foundIdx = [self.subviews indexOfObjectPassingTest:^BOOL(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        BOOL res = [obj isKindOfClass:[XYNavigationBar class]];
+        if (res) {
+            *stop = YES;
+        }
+        return res;
+    }];
+    if (foundIdx != NSNotFound) {
+        XYNavigationBar *navigationBar = self.subviews[foundIdx];
+        [self bringSubviewToFront:navigationBar];
+    }
+    
+}
+
+@end
+
+@implementation NSObject (XYSwizzlingExtension)
+
+#pragma mark - Swizzling
++ (void)exchangeImplementationWithSelector:(SEL)originSelector swizzledSelector:(SEL)swizzledSelector {
+    Class class = [self class];
+    Method originMethod = class_getInstanceMethod(class, originSelector);
+    Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
+    
+    BOOL didAddMethod = class_addMethod(class,
+                                        originSelector,
+                                        method_getImplementation(swizzledMethod),
+                                        method_getTypeEncoding(swizzledMethod));
+    if (didAddMethod) {
+        class_replaceMethod(class,
+                            swizzledSelector,
+                            method_getImplementation(originMethod),
+                            method_getTypeEncoding(originMethod));
+    } else {
+        method_exchangeImplementations(originMethod, swizzledMethod);
+    }
+}
+
+
+@end
